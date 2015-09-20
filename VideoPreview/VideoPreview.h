@@ -18,7 +18,7 @@ namespace DirectX {
 
 	public:
 		IGraphBuilder *pGraph;
-		ICaptureGraphBuilder2 *pBuild;
 		IVideoWindow* pVideoWindow;
+		IMediaControl* pControl;
 	};
 }

@@ -9,7 +9,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0">
-            <Button>Start</Button>
+            <Button Click="onStartButtonClick">Start</Button>
         </ToolBar>
         <Border Grid.Row="1" Name="VideoArea" />
     </Grid>
