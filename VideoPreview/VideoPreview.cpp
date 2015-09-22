@@ -17,7 +17,7 @@ using namespace DirectX;
 		}																	\
 	} while(false)
 
-CVideoPreview::CVideoPreview(void)
+CVideoPreview::CVideoPreview(void) : isStarted(false)
 {
 	pGraph = NULL;
 	pVideoWindow = NULL;
@@ -91,9 +91,13 @@ void CVideoPreview::start(IntPtr hWnd, double width, double height)
 	this->pGraph = pGraph.Detach();
 	this->pVideoWindow = pVideoWindow.Detach();
 	this->pControl = pControl.Detach();
+
+	this->IsStarted = true;
 }
 
 void CVideoPreview::stop()
 {
 	HRESULT_CHECK(pControl->Stop());
+
+	this->IsStarted = false;
 }

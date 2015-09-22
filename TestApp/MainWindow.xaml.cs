@@ -13,6 +13,9 @@ namespace TestApp
         public MainWindow()
         {
             InitializeComponent();
+
+            this.DataContext = this;
+            this.VideoPreview = new DirectX.CVideoPreview();
         }
 
         private void onWindowLoaded(object sender, RoutedEventArgs e)
@@ -21,11 +24,18 @@ namespace TestApp
         }
 
         Win32.CHWndHostControl videoHostControl = new Win32.CHWndHostControl();
-        DirectX.CVideoPreview videoPreview = new DirectX.CVideoPreview();
+        public DirectX.CVideoPreview VideoPreview { get; protected set; }
 
         private void onStartButtonClick(object sender, RoutedEventArgs e)
         {
-            videoPreview.start(videoHostControl.Handle, VideoArea.ActualWidth, VideoArea.ActualHeight);
+            if (!VideoPreview.IsStarted)
+            {
+                VideoPreview.start(videoHostControl.Handle, VideoArea.ActualWidth, VideoArea.ActualHeight);
+            }
+            else
+            {
+                VideoPreview.stop();
+            }
         }
     }
 }
