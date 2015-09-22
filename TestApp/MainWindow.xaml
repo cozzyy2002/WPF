@@ -24,7 +24,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0">
-            <Button Click="onStartButtonClick" Style="{StaticResource ResourceKey=StartStopButton}" />
+            <Button Command="{Binding Path=StartStopCommand}"
+                    Style="{StaticResource ResourceKey=StartStopButton}" />
         </ToolBar>
         <Border Grid.Row="1" Name="VideoArea" />
     </Grid>

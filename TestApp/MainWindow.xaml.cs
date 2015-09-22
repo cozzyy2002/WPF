@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace TestApp
@@ -16,6 +17,7 @@ namespace TestApp
 
             this.DataContext = this;
             this.VideoPreview = new DirectX.CVideoPreview();
+            this.StartStopCommand = new StartStopCommandImpl(this);
         }
 
         private void onWindowLoaded(object sender, RoutedEventArgs e)
@@ -25,16 +27,35 @@ namespace TestApp
 
         Win32.CHWndHostControl videoHostControl = new Win32.CHWndHostControl();
         public DirectX.CVideoPreview VideoPreview { get; protected set; }
+        public StartStopCommandImpl StartStopCommand { get; protected set; }
 
-        private void onStartButtonClick(object sender, RoutedEventArgs e)
+        public class StartStopCommandImpl : ICommand
         {
-            if (!VideoPreview.IsStarted)
+            public StartStopCommandImpl(MainWindow mainWindow)
             {
-                VideoPreview.start(videoHostControl.Handle, VideoArea.ActualWidth, VideoArea.ActualHeight);
+                this.mainWindow = mainWindow;
             }
-            else
+
+            MainWindow mainWindow;
+
+            public bool CanExecute(object parameter)
             {
-                VideoPreview.stop();
+                return true;
+            }
+
+            // This event is never used
+            public event EventHandler CanExecuteChanged { add { } remove { } }
+
+            public void Execute(object parameter)
+            {
+                if (!mainWindow.VideoPreview.IsStarted)
+                {
+                    mainWindow.VideoPreview.start(mainWindow.videoHostControl.Handle, mainWindow.VideoArea.ActualWidth, mainWindow.VideoArea.ActualHeight);
+                }
+                else
+                {
+                    mainWindow.VideoPreview.stop();
+                }
             }
         }
     }
