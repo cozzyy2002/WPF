@@ -23,11 +23,9 @@ namespace TestApp
         private void onWindowLoaded(object sender, RoutedEventArgs e)
         {
             // NOTE: If camera device is not found, this.VideoPreview = null
-            videoHostControl.attach(VideoArea);
-            VideoPreview.setup(videoHostControl.Handle, VideoArea.ActualWidth, VideoArea.ActualHeight);
+            VideoPreview.setup(VideoArea);
         }
 
-        Win32.CHWndHostControl videoHostControl = new Win32.CHWndHostControl();
         public DirectX.CVideoPreview VideoPreview { get; protected set; }
         public StartStopCommandImpl StartStopCommand { get; protected set; }
 

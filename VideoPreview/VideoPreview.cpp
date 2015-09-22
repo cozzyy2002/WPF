@@ -5,15 +5,16 @@
 
 #pragma comment(lib, "Strmiids")
 
-using namespace System;
 using namespace DirectX;
+using namespace System;
+using namespace System::Windows::Controls;
 
 #define HRESULT_CHECK(method) hResultCheck(method, #method)
 
 static HRESULT hResultCheck(HRESULT hr, String^ method)
 {
 	if(FAILED(hr)) {
-		throw String::Format("'{1}' failed. error=0x{0:x}", hr, method);
+		throw gcnew Win32::ComOperationFailedException(String::Format("'{1}' failed. error=0x{0:x}", hr, method), hr);
 	}
 	return hr;
 }
@@ -23,6 +24,7 @@ CVideoPreview::CVideoPreview(void) : isStarted(false)
 	pGraph = NULL;
 	pVideoWindow = NULL;
 	pControl = NULL;
+	hWndHost = nullptr;
 }
 
 CVideoPreview::~CVideoPreview()
@@ -45,10 +47,8 @@ CVideoPreview::!CVideoPreview()
 	if(pGraph) pGraph->Release();
 }
 
-void CVideoPreview::setup(IntPtr hWnd, double width, double height)
+void CVideoPreview::setup(Decorator^ parent)
 {
-	Console::WriteLine("CVideoPreview::start(0x{0:x},{1},{2})", hWnd, width, height);
-
 	// Initialize Filter Graph Manager and Capture Graph Manager
 	CComPtr<IGraphBuilder> pGraph;
 	CComPtr<ICaptureGraphBuilder2> pBuild;
@@ -75,10 +75,18 @@ void CVideoPreview::setup(IntPtr hWnd, double width, double height)
 	HRESULT_CHECK(pGraph->AddFilter(pCap, NULL));
 	HRESULT_CHECK(pBuild->RenderStream(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Video, pCap, NULL, NULL));
 
+	// Create control to host vide window
+	hWndHost = gcnew Win32::CHWndHostControl();
+	hWndHost->attach(parent);
+	IntPtr hwnd = hWndHost->Handle;
+	double width = parent->ActualWidth;
+	double height = parent->ActualHeight;
+	Console::WriteLine("Video window: hwnd=0x{0:x},size=({1},{2})", hwnd, width, height);
+
 	// Setup video window
 	CComPtr<IVideoWindow> pVideoWindow;
 	HRESULT_CHECK(pGraph.QueryInterface<IVideoWindow>(&pVideoWindow));
-	HRESULT_CHECK(pVideoWindow->put_Owner((OAHWND)(HANDLE)hWnd));
+	HRESULT_CHECK(pVideoWindow->put_Owner((OAHWND)(HANDLE)hwnd));
 	HRESULT_CHECK(pVideoWindow->put_WindowStyle(WS_CHILD | WS_CLIPSIBLINGS));
 	HRESULT_CHECK(pVideoWindow->SetWindowPosition(0, 0, (long)width, (long)height));
 

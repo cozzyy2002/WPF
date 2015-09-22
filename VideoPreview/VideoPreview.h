@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "HWndHostControl.h"
+
 using namespace System;
 
 namespace DirectX {
@@ -14,7 +16,7 @@ namespace DirectX {
 		~CVideoPreview();
 		!CVideoPreview();
 
-		void setup(System::IntPtr hWnd, double width, double heigh);
+		void setup(System::Windows::Controls::Decorator^ parent);
 		void start();
 		void stop();
 
@@ -34,6 +36,7 @@ namespace DirectX {
 		IGraphBuilder *pGraph;
 		IVideoWindow* pVideoWindow;
 		IMediaControl* pControl;
+		Win32::CHWndHostControl^ hWndHost;
 
 		bool isStarted;
 
