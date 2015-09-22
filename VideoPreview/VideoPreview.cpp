@@ -8,14 +8,15 @@
 using namespace System;
 using namespace DirectX;
 
-#define HRESULT_CHECK(method) \
-	do {																	\
-		HRESULT hr = method;												\
-		if(FAILED(hr)) {													\
-			Console::WriteLine("'" #method "' failed. error=0x{0:x}", hr);	\
-			return;															\
-		}																	\
-	} while(false)
+#define HRESULT_CHECK(method) hResultCheck(method, #method)
+
+static HRESULT hResultCheck(HRESULT hr, String^ method)
+{
+	if(FAILED(hr)) {
+		throw String::Format("'{1}' failed. error=0x{0:x}", hr, method);
+	}
+	return hr;
+}
 
 CVideoPreview::CVideoPreview(void) : isStarted(false)
 {
@@ -44,7 +45,7 @@ CVideoPreview::!CVideoPreview()
 	if(pGraph) pGraph->Release();
 }
 
-void CVideoPreview::start(IntPtr hWnd, double width, double height)
+void CVideoPreview::setup(IntPtr hWnd, double width, double height)
 {
 	Console::WriteLine("CVideoPreview::start(0x{0:x},{1},{2})", hWnd, width, height);
 
@@ -59,15 +60,14 @@ void CVideoPreview::start(IntPtr hWnd, double width, double height)
 	CComPtr<ICreateDevEnum> pDevEnum;
 	HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER));
 	CComPtr<IEnumMoniker> pEnum;
-	HRESULT_CHECK(pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0));
-	if(!pEnum) {
+	if(S_OK != HRESULT_CHECK(pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0))) {
 		Console::WriteLine("Video input device is not found.");
 		return;
 	}
 	CComPtr<IMoniker> pMoniker;
 	HRESULT_CHECK(pEnum->Next(1, &pMoniker, NULL));
 
-	// Create capture filter
+	// Create capture filter for the camera device
 	CComPtr<IBaseFilter> pCap;
 	HRESULT_CHECK(pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&pCap));
 
@@ -82,21 +82,37 @@ void CVideoPreview::start(IntPtr hWnd, double width, double height)
 	HRESULT_CHECK(pVideoWindow->put_WindowStyle(WS_CHILD | WS_CLIPSIBLINGS));
 	HRESULT_CHECK(pVideoWindow->SetWindowPosition(0, 0, (long)width, (long)height));
 
-	// Start preview
+	// Create IMediaControl object
 	CComPtr<IMediaControl> pControl;
 	HRESULT_CHECK(pGraph.QueryInterface<IMediaControl>(&pControl));
-	HRESULT_CHECK(pControl->Run());
 
 	// Move COM objects to this member variables
 	this->pGraph = pGraph.Detach();
 	this->pVideoWindow = pVideoWindow.Detach();
 	this->pControl = pControl.Detach();
+}
+
+void CVideoPreview::start()
+{
+	if(!pVideoWindow || !pControl) {
+		Console::WriteLine("COM object(s) is not properly created.");
+		return;
+	}
+
+	HRESULT_CHECK(pVideoWindow->put_Visible(OATRUE));
+	HRESULT_CHECK(pControl->Run());
 
 	this->IsStarted = true;
 }
 
 void CVideoPreview::stop()
 {
+	if(!pVideoWindow || !pControl) {
+		Console::WriteLine("COM object(s) is not properly created.");
+		return;
+	}
+
+	HRESULT_CHECK(pVideoWindow->put_Visible(OAFALSE));
 	HRESULT_CHECK(pControl->Stop());
 
 	this->IsStarted = false;

@@ -16,13 +16,15 @@ namespace TestApp
             InitializeComponent();
 
             this.DataContext = this;
-            this.VideoPreview = new DirectX.CVideoPreview();
             this.StartStopCommand = new StartStopCommandImpl(this);
+            this.VideoPreview = new DirectX.CVideoPreview();
         }
 
         private void onWindowLoaded(object sender, RoutedEventArgs e)
         {
+            // NOTE: If camera device is not found, this.VideoPreview = null
             videoHostControl.attach(VideoArea);
+            VideoPreview.setup(videoHostControl.Handle, VideoArea.ActualWidth, VideoArea.ActualHeight);
         }
 
         Win32.CHWndHostControl videoHostControl = new Win32.CHWndHostControl();
@@ -40,7 +42,7 @@ namespace TestApp
 
             public bool CanExecute(object parameter)
             {
-                return true;
+                return (mainWindow.VideoPreview != null);
             }
 
             // This event is never used
@@ -50,7 +52,7 @@ namespace TestApp
             {
                 if (!mainWindow.VideoPreview.IsStarted)
                 {
-                    mainWindow.VideoPreview.start(mainWindow.videoHostControl.Handle, mainWindow.VideoArea.ActualWidth, mainWindow.VideoArea.ActualHeight);
+                    mainWindow.VideoPreview.start();
                 }
                 else
                 {

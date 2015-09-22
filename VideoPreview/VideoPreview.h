@@ -14,7 +14,8 @@ namespace DirectX {
 		~CVideoPreview();
 		!CVideoPreview();
 
-		void start(System::IntPtr hWnd, double width, double heigh);
+		void setup(System::IntPtr hWnd, double width, double heigh);
+		void start();
 		void stop();
 
 		property bool IsStarted {
