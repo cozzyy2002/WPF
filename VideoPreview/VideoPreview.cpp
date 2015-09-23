@@ -72,7 +72,7 @@ void CVideoPreview::setup(Decorator^ parent)
 }
 
 /**
- * Setup DirectShow COM objects
+ * Setup COM objects for DirectShow
  */
 void CVideoPreview::setup(IntPtr hwnd, double width, double height)
 {

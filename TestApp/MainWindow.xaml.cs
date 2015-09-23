@@ -22,7 +22,6 @@ namespace TestApp
 
         private void onWindowLoaded(object sender, RoutedEventArgs e)
         {
-            // NOTE: If camera device is not found, this.VideoPreview = null
             VideoPreview.setup(VideoArea);
         }
 
