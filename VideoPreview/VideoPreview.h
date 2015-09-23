@@ -40,6 +40,7 @@ namespace DirectX {
 
 		bool isStarted;
 
+		void setup(IntPtr hwnd, double width, double height);
 		void onPropertyChanged(System::String^ name, System::Object^ value)
 		{
 			Console::WriteLine("Property '{0}' is changed: {1}", name, value);
