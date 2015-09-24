@@ -145,8 +145,8 @@ void CVideoPreview::stop()
 		return;
 	}
 
-	HRESULT_CHECK(pVideoWindow->put_Visible(OAFALSE));
 	HRESULT_CHECK(pControl->Stop());
+	HRESULT_CHECK(pVideoWindow->put_Visible(OAFALSE));
 
 	this->IsStarted = false;
 }
