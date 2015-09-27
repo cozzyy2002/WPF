@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 
@@ -27,6 +30,31 @@ namespace TestApp
 
         public DirectX.CVideoPreview VideoPreview { get; protected set; }
         public StartStopCommandImpl StartStopCommand { get; protected set; }
+
+        ObjectDataProvider provider;
+
+        public string LanguageName
+        {
+            get { return languageName; }
+            set
+            {
+                if (languageName != value)
+                {
+                    languageName = value;
+                    try
+                    {
+                        CultureInfo ci = new CultureInfo(value);
+                        Console.WriteLine("Changing Language to {0}", ci);
+                        TestApp.Properties.Resources.Culture = ci;
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine("{0}: Language={1}", ex.Message, value);
+                    }
+                }
+            }
+        }
+        string languageName = "en-US";
 
         public class StartStopCommandImpl : ICommand
         {

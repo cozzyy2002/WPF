@@ -1,19 +1,21 @@
 ﻿<Window x:Class="TestApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TestApp.Properties"
         Title="MainWindow" Height="350" Width="525"
         Loaded="onWindowLoaded">
     <Window.Resources>
+        <local:Resources x:Key="Resources" />
         <Style TargetType="Button">
             <Setter Property="MinWidth" Value="40" />
         </Style>
         <Style x:Key="StartStopButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=VideoPreview.IsStarted}" Value="False">
-                    <Setter Property="Content" Value="Start" />
+                    <Setter Property="Content" Value="{Binding Path=MainWindow_VideoPreviewStartButton, Source={StaticResource Resources}}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Path=VideoPreview.IsStarted}" Value="True">
-                    <Setter Property="Content" Value="Stop" />
+                    <Setter Property="Content" Value="{Binding Path=MainWindow_VideoPreviewStopButton, Source={StaticResource Resources}}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -26,6 +28,9 @@
         <ToolBar Grid.Row="0">
             <Button Command="{Binding Path=StartStopCommand}"
                     Style="{StaticResource ResourceKey=StartStopButton}" />
+            <Separator />
+            <Label>Language</Label>
+            <TextBox Text="{Binding Path=LanguageName}" MinWidth="40" />
         </ToolBar>
         <Border Grid.Row="1" Name="VideoArea" />
     </Grid>
