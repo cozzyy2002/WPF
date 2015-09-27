@@ -121,7 +121,7 @@ void CVideoPreview::setup(IntPtr hwnd, double width, double height)
 		Console::WriteLine("Setup DirectShow is completed.");
 
 	} catch(Exception^ ex) {
-		Console::WriteLine("Exception: {0}", ex->Message);
+		Console::WriteLine("Exception: ", ex->Message);
 	}
 }
 
