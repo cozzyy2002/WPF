@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace TestApp
 {
@@ -75,14 +72,26 @@ namespace TestApp
 
             public void Execute(object parameter)
             {
-                if (!mainWindow.VideoPreview.IsStarted)
-                {
-                    mainWindow.VideoPreview.start();
-                }
-                else
-                {
-                    mainWindow.VideoPreview.stop();
-                }
+                // Start/Stop preview by calling IsCameraActiveChanged callback
+                mainWindow.IsCameraActive = !mainWindow.IsCameraActive;
+            }
+        }
+
+        public static readonly DependencyProperty IsCameraActiveProperty = DependencyProperty.Register(
+            "IsCameraActive", typeof(bool), typeof(MainWindow), new PropertyMetadata(IsCameraActiveChanged));
+
+        private static void IsCameraActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            MainWindow _this = (MainWindow)d;
+            if ((bool)e.NewValue)
+            {
+                // Start preview when ToggleButton.IsChecked is True
+                _this.VideoPreview.start();
+            }
+            else
+            {
+                // Stop preview when ToggleButton.IsChecked is False
+                _this.VideoPreview.stop();
             }
         }
 
@@ -91,23 +100,8 @@ namespace TestApp
         /// </summary>
         public bool IsCameraActive
         {
-            get { return isCameraActive; }
-            set
-            {
-                isCameraActive = value;
-                if (isCameraActive)
-                {
-                    // Start preview when ToggleButton.IsChecked is True
-                    VideoPreview.start();
-                }
-                else
-                {
-                    // Stop preview when ToggleButton.IsChecked is False
-                    VideoPreview.stop();
-                }
-            }
+            get { return (bool)GetValue(IsCameraActiveProperty); }
+            set { SetValue(IsCameraActiveProperty, value); }
         }
-
-        bool isCameraActive = false;
     }
 }
