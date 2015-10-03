@@ -19,6 +19,48 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        
+        <XmlDataProvider x:Key="DeviceControlData">
+            <x:XData>
+                <Devices xmlns="">
+                    <Device Type="Camera">
+                        <Action Type="Start">
+                            <Image>/Resources/Start.png</Image>
+                        </Action>
+                        <Action Type="Stop">
+                            <Image>/Resources/Stop.png</Image>
+                        </Action>
+                    </Device>
+                </Devices>
+            </x:XData>
+        </XmlDataProvider>
+
+        <DataTemplate x:Key="DeviceControlTemplate">
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="Grid">
+                        <Setter Property="DataContext" Value="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType=ToggleButton}}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                <Setter Property="Tag" Value="{Binding XPath=Action[@Type\=\'Stop\']}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False">
+                                <Setter Property="Tag" Value="{Binding XPath=Action[@Type\=\'Start\']}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0" Source="{Binding XPath=Image}"
+                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=Grid}, Path=Tag}" />
+                <Label Grid.Row="1" Content="{Binding XPath=@Type}"
+                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}, Path=Tag}"
+                        FontSize="10"/>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -28,6 +70,11 @@
         <ToolBar Grid.Row="0">
             <Button Command="{Binding Path=StartStopCommand}"
                     Style="{StaticResource ResourceKey=StartStopButton}" />
+            <Separator />
+            <ToggleButton ContentTemplate="{StaticResource DeviceControlTemplate}"
+                          Tag="{Binding Source={StaticResource DeviceControlData}, XPath=Devices/Device[@Type\=\'Camera\']}"
+                          IsChecked="{Binding Path=IsCameraActive}"
+                          Name="StartStopToggleButton"/>
             <Separator />
             <Label>Language</Label>
             <TextBox Text="{Binding Path=LanguageName}" MinWidth="40" />

@@ -85,5 +85,24 @@ namespace TestApp
                 }
             }
         }
+
+        public bool IsCameraActive
+        {
+            get { return isCameraActive; }
+            set
+            {
+                isCameraActive = value;
+                if (isCameraActive)
+                {
+                    VideoPreview.start();
+                }
+                else
+                {
+                    VideoPreview.stop();
+                }
+            }
+        }
+
+        bool isCameraActive = false;
     }
 }
