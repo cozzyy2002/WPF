@@ -5,10 +5,12 @@
         Title="MainWindow" Height="350" Width="525"
         Loaded="onWindowLoaded">
     <Window.Resources>
+        <!-- Language resource for I18N -->
         <local:Resources x:Key="Resources" />
         <Style TargetType="Button">
             <Setter Property="MinWidth" Value="40" />
         </Style>
+        <!-- Start/Stop button with label refer language resource -->
         <Style x:Key="StartStopButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=VideoPreview.IsStarted}" Value="False">
@@ -20,6 +22,7 @@
             </Style.Triggers>
         </Style>
         
+        <!-- XML data which provides Start/Stop image and device type -->
         <XmlDataProvider x:Key="DeviceControlData">
             <x:XData>
                 <Devices xmlns="">
@@ -35,6 +38,7 @@
             </x:XData>
         </XmlDataProvider>
 
+        <!-- DataTemplate to switch Start/Stop by referring DeviceControlData XML resource -->
         <DataTemplate x:Key="DeviceControlTemplate">
             <Grid>
                 <Grid.Resources>
@@ -68,9 +72,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0">
+            <!-- BUtton control for I18N -->
             <Button Command="{Binding Path=StartStopCommand}"
                     Style="{StaticResource ResourceKey=StartStopButton}" />
             <Separator />
+
+            <!-- ToggleButton control for XmlDataProvider and DataTemplate -->
             <ToggleButton ContentTemplate="{StaticResource DeviceControlTemplate}"
                           Tag="{Binding Source={StaticResource DeviceControlData}, XPath=Devices/Device[@Type\=\'Camera\']}"
                           IsChecked="{Binding Path=IsCameraActive}"

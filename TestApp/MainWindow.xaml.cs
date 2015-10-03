@@ -86,6 +86,9 @@ namespace TestApp
             }
         }
 
+        /// <summary>
+        /// IsCameraActive property for ToggleButton control
+        /// </summary>
         public bool IsCameraActive
         {
             get { return isCameraActive; }
@@ -94,10 +97,12 @@ namespace TestApp
                 isCameraActive = value;
                 if (isCameraActive)
                 {
+                    // Start preview when ToggleButton.IsChecked is True
                     VideoPreview.start();
                 }
                 else
                 {
+                    // Stop preview when ToggleButton.IsChecked is False
                     VideoPreview.stop();
                 }
             }
