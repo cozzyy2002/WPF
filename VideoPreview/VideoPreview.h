@@ -37,6 +37,7 @@ namespace DirectX {
 		IVideoWindow* pVideoWindow;
 		IMediaControl* pControl;
 		Win32::CHWndHostControl^ hWndHost;
+		System::Windows::Threading::DispatcherOperation^ setupResult;
 
 		bool isStarted;
 
@@ -46,5 +47,6 @@ namespace DirectX {
 			Console::WriteLine("Property '{0}' is changed: {1}", name, value);
 			PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(name));
 		}
+		bool setupResultCheck();
 	};
 }

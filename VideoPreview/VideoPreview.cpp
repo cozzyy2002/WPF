@@ -26,6 +26,7 @@ CVideoPreview::CVideoPreview(void) : isStarted(false)
 	pVideoWindow = NULL;
 	pControl = NULL;
 	hWndHost = nullptr;
+	setupResult = nullptr;
 }
 
 CVideoPreview::~CVideoPreview()
@@ -63,7 +64,7 @@ void CVideoPreview::setup(Decorator^ parent)
 	double height = parent->ActualHeight;
 	Console::WriteLine("Video window: hwnd=0x{0:x},size=({1},{2})", hwnd, width, height);
 
-	Dispatcher::CurrentDispatcher->BeginInvoke(
+	setupResult = Dispatcher::CurrentDispatcher->BeginInvoke(
 		DispatcherPriority::SystemIdle,
 		gcnew Action<IntPtr, double, double>(this, &CVideoPreview::setup),
 		hwnd, width, height);
@@ -127,10 +128,7 @@ void CVideoPreview::setup(IntPtr hwnd, double width, double height)
 
 void CVideoPreview::start()
 {
-	if(!pVideoWindow || !pControl) {
-		Console::WriteLine("COM object(s) is not properly created.");
-		return;
-	}
+	if(!setupResultCheck()) return;
 
 	HRESULT_CHECK(pVideoWindow->put_Visible(OATRUE));
 	HRESULT_CHECK(pControl->Run());
@@ -140,13 +138,35 @@ void CVideoPreview::start()
 
 void CVideoPreview::stop()
 {
-	if(!pVideoWindow || !pControl) {
-		Console::WriteLine("COM object(s) is not properly created.");
-		return;
-	}
+	if(!setupResultCheck()) return;
 
 	HRESULT_CHECK(pControl->Stop());
 	HRESULT_CHECK(pVideoWindow->put_Visible(OAFALSE));
 
 	this->IsStarted = false;
+}
+
+bool CVideoPreview::setupResultCheck()
+{
+	if(setupResult == nullptr) {
+		Console::WriteLine("setup() is not called.");
+		return false;
+	}
+
+	try {
+		DispatcherOperationStatus st = setupResult->Wait(TimeSpan(0, 0, 5));
+		if(st != DispatcherOperationStatus::Completed) {
+			Console::WriteLine("Failed to wait for setup to complete: {0}", st);
+			return false;
+		}
+	} catch(Exception^ ex) {
+		Console::WriteLine("{0}: {1}", ex->GetType(), ex->Message);
+		return false;
+	}
+
+	if(!pVideoWindow || !pControl) {
+		Console::WriteLine("COM object(s) is not properly created.");
+		return false;
+	}
+	return true;
 }

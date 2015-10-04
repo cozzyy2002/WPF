@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -9,7 +10,7 @@ namespace TestApp
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public MainWindow()
         {
@@ -17,18 +18,21 @@ namespace TestApp
 
             this.DataContext = this;
             this.StartStopCommand = new StartStopCommandImpl(this);
-            this.VideoPreview = new DirectX.CVideoPreview();
         }
 
-        private void onWindowLoaded(object sender, RoutedEventArgs e)
-        {
-            VideoPreview.setup(VideoArea);
+        public DirectX.CVideoPreview VideoPreview {
+            get { return videoPreview; }
+            protected set {
+                if (videoPreview != value)
+                {
+                    videoPreview = value;
+                    raisePropertyChanged("VideoPreview");
+                }
+            }
         }
+        DirectX.CVideoPreview videoPreview = null;
 
-        public DirectX.CVideoPreview VideoPreview { get; protected set; }
         public StartStopCommandImpl StartStopCommand { get; protected set; }
-
-        ObjectDataProvider provider;
 
         public string LanguageName
         {
@@ -58,6 +62,12 @@ namespace TestApp
             public StartStopCommandImpl(MainWindow mainWindow)
             {
                 this.mainWindow = mainWindow;
+                mainWindow.PropertyChanged += (object o, PropertyChangedEventArgs e) => {
+                    if (e.PropertyName == "VideoPreview")
+                    {
+                        if (CanExecuteChanged != null) { CanExecuteChanged(this, new EventArgs()); }
+                    }
+                };
             }
 
             MainWindow mainWindow;
@@ -67,8 +77,7 @@ namespace TestApp
                 return (mainWindow.VideoPreview != null);
             }
 
-            // This event is never used
-            public event EventHandler CanExecuteChanged { add { } remove { } }
+            public event EventHandler CanExecuteChanged;
 
             public void Execute(object parameter)
             {
@@ -77,31 +86,42 @@ namespace TestApp
             }
         }
 
-        public static readonly DependencyProperty IsCameraActiveProperty = DependencyProperty.Register(
-            "IsCameraActive", typeof(bool), typeof(MainWindow), new PropertyMetadata(IsCameraActiveChanged));
-
-        private static void IsCameraActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            MainWindow _this = (MainWindow)d;
-            if ((bool)e.NewValue)
-            {
-                // Start preview when ToggleButton.IsChecked is True
-                _this.VideoPreview.start();
-            }
-            else
-            {
-                // Stop preview when ToggleButton.IsChecked is False
-                _this.VideoPreview.stop();
-            }
-        }
-
         /// <summary>
         /// IsCameraActive property for ToggleButton control
         /// </summary>
         public bool IsCameraActive
         {
-            get { return (bool)GetValue(IsCameraActiveProperty); }
-            set { SetValue(IsCameraActiveProperty, value); }
+            get { return (videoPreview != null) ? videoPreview.IsStarted : false; }
+            set
+            {
+                if (IsCameraActive == value) return;
+
+                if (VideoPreview == null)
+                {
+                    VideoPreview = new DirectX.CVideoPreview();
+                    VideoPreview.setup(VideoArea);
+                }
+
+                if (value)
+                {
+                    // Start preview when ToggleButton.IsChecked is True
+                    VideoPreview.start();
+                }
+                else
+                {
+                    // Stop preview when ToggleButton.IsChecked is False
+                    VideoPreview.stop();
+                }
+                raisePropertyChanged("IsCameraActive");
+            }
         }
+
+        void raisePropertyChanged(string name)
+        {
+            if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(name)); }
+        }
+
+        // Implementation of INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
