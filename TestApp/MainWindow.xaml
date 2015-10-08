@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:TestApp.Properties"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" Closed="onWindowClosed">
     <Window.Resources>
         <!-- Language resource for I18N -->
         <local:Resources x:Key="Resources" />
@@ -39,9 +39,9 @@
 
         <!-- DataTemplate to switch Start/Stop by referring DeviceControlData XML resource -->
         <DataTemplate x:Key="DeviceControlTemplate">
-            <Grid>
-                <Grid.Resources>
-                    <Style TargetType="Grid">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="StackPanel">
                         <Setter Property="DataContext" Value="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType=ToggleButton}}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
@@ -52,17 +52,12 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Grid.Resources>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Image Grid.Row="0" Source="{Binding XPath=Image}"
-                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=Grid}, Path=Tag}" />
-                <Label Grid.Row="1" Content="{Binding XPath=@Type}"
-                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}, Path=Tag}"
-                        FontSize="10"/>
-            </Grid>
+                </StackPanel.Resources>
+                <Label Content="{Binding XPath=@Type}"
+                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}, Path=Tag}" />
+                <Image Source="{Binding XPath=Image}"
+                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Tag}" />
+            </StackPanel>
         </DataTemplate>
     </Window.Resources>
     <Grid>
@@ -83,7 +78,9 @@
                           Name="StartStopToggleButton"/>
             <Separator />
             <Label>Language</Label>
-            <TextBox Text="{Binding Path=LanguageName}" MinWidth="40" />
+            <ComboBox ItemsSource="{Binding Path=Cultures}" DisplayMemberPath="DisplayName"
+                      SelectedItem="{Binding Path=Settings.CultureInfo}"
+                      MinWidth="80"/>
         </ToolBar>
         <Border Grid.Row="1" Name="VideoArea" />
     </Grid>

@@ -8,22 +8,48 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TestApp.Properties
-{
-
-
+namespace TestApp.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>en-US</string>
+  <string>ja-JP</string>
+  <string>zh-CN</string>
+  <string>pt</string>
+  <string>ru</string>
+  <string>es</string>
+  <string>ko</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Cultures {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Cultures"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("en-US")]
+        public global::System.Globalization.CultureInfo CultureInfo {
+            get {
+                return ((global::System.Globalization.CultureInfo)(this["CultureInfo"]));
+            }
+            set {
+                this["CultureInfo"] = value;
             }
         }
     }

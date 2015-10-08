@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Threading;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace TestApp
@@ -18,6 +19,26 @@ namespace TestApp
 
             this.DataContext = this;
             this.StartStopCommand = new StartStopCommandImpl(this);
+
+            this.Settings = Properties.Settings.Default;
+            this.Settings.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
+            {
+                switch (e.PropertyName) {
+                    case "CultureInfo":
+                        CultureInfo value = Settings.CultureInfo;
+                        Console.WriteLine("Current culture={0}", value.EnglishName);
+                        value.ClearCachedData();
+                        Thread.CurrentThread.CurrentCulture = value;
+                        Thread.CurrentThread.CurrentUICulture = value;
+                        break;
+                }
+            };
+            this.Cultures = new List<CultureInfo>();
+            foreach (string s in this.Settings.Cultures)
+            {
+                this.Cultures.Add(new CultureInfo(s));
+            }
+
         }
 
         public DirectX.CVideoPreview VideoPreview {
@@ -33,6 +54,9 @@ namespace TestApp
         DirectX.CVideoPreview videoPreview = null;
 
         public StartStopCommandImpl StartStopCommand { get; protected set; }
+
+        public Properties.Settings Settings { get; protected set; }
+        public List<CultureInfo> Cultures { get; protected set; }
 
         public string LanguageName
         {
@@ -123,5 +147,10 @@ namespace TestApp
 
         // Implementation of INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void onWindowClosed(object sender, EventArgs e)
+        {
+            Settings.Save();
+        }
     }
 }
