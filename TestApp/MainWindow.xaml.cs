@@ -58,29 +58,6 @@ namespace TestApp
         public Properties.Settings Settings { get; protected set; }
         public List<CultureInfo> Cultures { get; protected set; }
 
-        public string LanguageName
-        {
-            get { return languageName; }
-            set
-            {
-                if (languageName != value)
-                {
-                    languageName = value;
-                    try
-                    {
-                        CultureInfo ci = new CultureInfo(value);
-                        Console.WriteLine("Changing Language to {0}", ci);
-                        TestApp.Properties.Resources.Culture = ci;
-                    }
-                    catch(Exception ex)
-                    {
-                        Console.WriteLine("{0}: Language={1}", ex.Message, value);
-                    }
-                }
-            }
-        }
-        string languageName = "en-US";
-
         public class StartStopCommandImpl : ICommand
         {
             public StartStopCommandImpl(MainWindow mainWindow)

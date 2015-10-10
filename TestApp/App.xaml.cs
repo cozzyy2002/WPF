@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using System.Windows;
 
 namespace TestApp
@@ -14,5 +8,10 @@ namespace TestApp
     /// </summary>
     public partial class App : Application
     {
+        private void onStartup(object sender, StartupEventArgs e)
+        {
+            TestApp.Properties.Settings settings = TestApp.Properties.Settings.Default;
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = settings.CultureInfo;
+        }
     }
 }
