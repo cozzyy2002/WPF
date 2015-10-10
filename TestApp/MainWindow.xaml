@@ -78,9 +78,20 @@
                           Name="StartStopToggleButton"/>
             <Separator />
             <Label>Language</Label>
-            <ComboBox ItemsSource="{Binding Path=Cultures}" DisplayMemberPath="DisplayName"
+            <ComboBox ItemsSource="{Binding Path=Cultures}"
                       SelectedItem="{Binding Path=Settings.CultureInfo}"
-                      MinWidth="80"/>
+                      MinWidth="80">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding Path=NativeName, Mode=OneWay}" />
+                            (
+                            <Run Text="{Binding Path=EnglishName, Mode=OneWay}" />
+                            )
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </ToolBar>
         <Border Grid.Row="1" Name="VideoArea" />
     </Grid>

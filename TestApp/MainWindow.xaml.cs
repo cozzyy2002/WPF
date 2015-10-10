@@ -27,9 +27,11 @@ namespace TestApp
                     case "CultureInfo":
                         CultureInfo value = Settings.CultureInfo;
                         Console.WriteLine("Current culture={0}", value.EnglishName);
-                        value.ClearCachedData();
-                        Thread.CurrentThread.CurrentCulture = value;
-                        Thread.CurrentThread.CurrentUICulture = value;
+                        Dispatcher.BeginInvoke((Action)(() => {
+                            Thread.CurrentThread.CurrentCulture = value;
+                            Thread.CurrentThread.CurrentUICulture = value;
+                            MessageBox.Show(DateTime.Now.ToString("F"), value.NativeName, MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+                        }));
                         break;
                 }
             };
