@@ -1,0 +1,42 @@
+﻿<html><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=utf-8" /><META NAME="save" CONTENT="history" /><title xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">LocBaml ツールのサンプル</title><META NAME="Description" CONTENT="この例では、LocBaml ツールを使用して入力ファイルを解析し、ローカライズ可能なリソースを作成して、ローカライズされたバイナリを生成する方法を示します。このツールは C# ファイルでビルドされ、LocBaml ツールの入力として使用するダイナミック リンク ライブラリ (DLL) は Extensible Application Markup Language (XAML) ファイルでビルドされます。このツールの使用方法については、「How to: Localize an Applicati ..."></META><META NAME="MS.LOCALE" CONTENT="en-us" /><style>
+body
+{font-family:Verdana;font-size:medium;}
+div#mainSection, div#header
+{font-size:70%;width: 100%;}
+div#mainBody
+{font-size:90%;}
+div#mainSection div table
+{font-size: 100%;text-align: left;}
+span#nsrTitle
+{color:#003399;font-size:90%;font-weight:600;}
+div#header
+{background-color:#D4DFFF;}
+.heading
+{font-size:120%;color:#003399;}
+.subHeading
+{font-size:100%;margin-bottom:4;}
+li
+{margin-top:-2;margin-bottom:3;}
+p
+{margin-top:10;margin-bottom:5;}
+div.tableSection p
+{margin-top:1;margin-bottom:4;}	
+div#mainSection table th
+{background-color:#EFEFF7;color:#000066;text-align:left;}
+div#mainSection table td
+{background-color:#F7F7FF;}
+div#mainSection table
+{margin-top:5px;margin-bottom: px;}
+			</style></head><body><div id="header"><table width="100%" id="topTable"><tr id="headerTableRow2" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><td align="left"><span id="nsrTitle">LocBaml ツールのサンプル</span></td></tr></table></div><div id="mainSection"><div id="mainBody"><br /><font color="DarkGray">[This readme is a partial copy of the sample's topic in the SDK documentation.]</font><br /><div class="introduction"><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">この例では、LocBaml ツールを使用して入力ファイルを解析し、ローカライズ可能なリソースを作成して、ローカライズされたバイナリを生成する方法を示します。このツールは C# ファイルでビルドされ、LocBaml ツールの入力として使用するダイナミック リンク ライブラリ (DLL) は Extensible Application Markup Language (XAML) ファイルでビルドされます。このツールの使用方法については、「方法 : アプリケーションをローカライズする」を参照してください。</p><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">このサンプルでは、Windows Presentation Foundation の特定の機能を示します。そのため、アプリケーション開発のベスト プラクティスに従っていません。Windows Presentation Foundation (WPF) と Microsoft .NET Framework のアプリケーション開発ベスト プラクティスの包括的な説明については、適宜、次のトピックを参照してください。</p><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">ユーザー補助 - 「ユーザー補助のベスト プラクティス」</p><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">ローカリゼーション - 「WPF のグローバリゼーションおよびローカリゼーションの概要」</p><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">パフォーマンス - 「WPF アプリケーションのパフォーマンスの最適化」</p><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">セキュリティ - 「Windows Presentation Foundation のセキュリティ」</p></div><h1 class="heading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><span onclick="ExpandCollapse(sectionToggle0)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(sectionToggle0, event)" tabindex="0">サンプルのビルド</span></h1><div id="sectionSection0" class="section"><ul xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p>
+            Windows ソフトウェア開発キット (SDK) をインストールして、そのビルド環境のコマンド ウィンドウを開きます。[スタート] メニューの [すべてのプログラム]、[Microsoft Windows SDK] の順にポイントし、[CMD シェル] をクリックします。
+          </p></li><li><p>
+            サンプルをハード ディスク ドライブにダウンロードします。通常は、ソフトウェア開発キット (SDK) のドキュメントからダウンロードします。
+          </p></li><li><p>
+            ビルド環境のコマンド ウィンドウからサンプルをビルドするには、サンプルのソース ディレクトリに移動します。コマンド プロンプトで「MSBUILD」と入力します。
+          </p></li><li><p>
+            Microsoft Visual Studio でサンプルをビルドするには、サンプル ソリューションかプロジェクト ファイルを読み込んで、Ctrl キーと Shift キーを押しながら B キーを押します。
+          </p></li></ul></div><h1 class="heading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><span onclick="ExpandCollapse(sectionToggle1)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(sectionToggle1, event)" tabindex="0">サンプルの実行</span></h1><div id="sectionSection1" class="section"><ul xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p>
+            コンパイルしたサンプルをビルド環境のコマンド ウィンドウから実行するには、サンプルのソース コード フォルダの下にある Bin\Debug または Bin\Release フォルダで .exe ファイルを実行します。
+          </p></li><li><p>
+            コンパイルしたサンプルを Visual Studio でデバッグしながら実行するには、F5 キーを押します。
+          </p></li></ul></div><h1 class="heading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><span onclick="ExpandCollapse(seeAlsoToggle)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(seeAlsoToggle, event)" tabindex="0">参照</span></h1><div id="seeAlsoSection" class="section"><h4 class="subHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">概念</h4><div class="seeAlsoStyle">自動レイアウトの使用の概要</div></div></div></div></body></html>

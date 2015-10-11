@@ -1,0 +1,9 @@
+SCC = This is a Source Code Control file
+
+[HelloApp.csproj]
+SCC_Aux_Path = "\\lhsdkvss1\content"
+SCC_Project_Name = "$/Avalon_Samples/Samples/GlobalizationLocalization/LocBaml/XAML", YUAZDAAA
+
+[HelloApp.vbproj]
+SCC_Aux_Path = "\\lhsdkvss1\content"
+SCC_Project_Name = "$/Avalon_Samples/Samples/GlobalizationLocalization/LocBaml/XAML", YUAZDAAA
