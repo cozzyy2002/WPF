@@ -65,12 +65,18 @@ namespace BamlLocalization
                         // write out each resource
                         foreach (DictionaryEntry entry in dict)
                         {
+                            BamlLocalizableResourceKey key = (BamlLocalizableResourceKey)entry.Key;
+                            BamlLocalizableResource resource = (BamlLocalizableResource)entry.Value;
+
+                            // Output XlmData
+                            if (key.Uid.Contains("XmlData") && resource.Category == LocalizationCategory.None) resource.Category = LocalizationCategory.XmlData;
+                            // Ignore Category None or no content
+                            if (resource.Category == LocalizationCategory.None) continue;
+                            if (string.IsNullOrEmpty(resource.Content)) continue;
+
                             // column 1: baml stream name
                             writer.WriteColumn(bamlStreamList[i].Name);
                             
-                            BamlLocalizableResourceKey key = (BamlLocalizableResourceKey) entry.Key;
-                            BamlLocalizableResource resource = (BamlLocalizableResource)entry.Value;
-
                             // column 2: localizable resource key
                             writer.WriteColumn(LocBamlConst.ResourceKeyToString(key));
 
