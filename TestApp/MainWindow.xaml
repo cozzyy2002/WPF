@@ -25,11 +25,13 @@
         <XmlDataProvider x:Uid="XmlDataProvider_1" x:Key="DeviceControlData">
             <x:XData x:Uid="x:XData_1">
                 <Devices x:Uid="Devices_1" xmlns="">
-                    <Device x:Uid="Device_1" Type="Camera">
+                    <Device x:Uid="Device_1" Type="Camera" Label="Camera">
                         <Action x:Uid="Action_1" Type="Start">
+                            <Label x:Uid="Label_4">Start</Label>
                             <Image x:Uid="Image_1">/Resources/Start.png</Image>
                         </Action>
                         <Action x:Uid="Action_2" Type="Stop">
+                            <Label x:Uid="Label_5">Stop</Label>
                             <Image x:Uid="Image_2">/Resources/Stop.png</Image>
                         </Action>
                     </Device>
@@ -53,8 +55,12 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Resources>
-                <Label x:Uid="Label_1" Content="{Binding XPath=@Type}"
+                <TextBlock>
+                </TextBlock>
+                <Label x:Uid="Label_1" Content="{Binding XPath=@Label}"
                         DataContext="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}, Path=Tag}" />
+                <Label x:Uid="Image_x3" Content="{Binding XPath=Label}"
+                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Tag}" />
                 <Image x:Uid="Image_3" Source="{Binding XPath=Image}"
                         DataContext="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Tag}" />
             </StackPanel>
