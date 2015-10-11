@@ -1,0 +1,21 @@
+﻿TestApp.g.en-US.resources:mainwindow.baml,Window_1:System.Windows.Window.Title,Title,True,True,,MainWindow
+TestApp.g.en-US.resources:mainwindow.baml,XmlDataProvider_1:System.Windows.Data.XmlDataProvider.$LiteralContent,XmlData,False,True,,"&lt;Devices x:Uid=&quot;Devices_1&quot; xmlns=&quot;&quot; xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;&gt;
+                    &lt;Device x:Uid=&quot;Device_1&quot; Type=&quot;カメラ&quot;&gt;
+                        &lt;Action x:Uid=&quot;Action_1&quot; Type=&quot;開始&quot;&gt;
+                            &lt;Image x:Uid=&quot;Image_1&quot;&gt;/Resources/Start.png&lt;/Image&gt;
+                        &lt;/Action&gt;
+                        &lt;Action x:Uid=&quot;Action_2&quot; Type=&quot;停止&quot;&gt;
+                            &lt;Image x:Uid=&quot;Image_2&quot;&gt;/Resources/Stop.png&lt;/Image&gt;
+                        &lt;/Action&gt;
+                    &lt;/Device&gt;
+                &lt;/Devices&gt;"
+TestApp.g.en-US.resources:mainwindow.baml,Label_1:System.Windows.Controls.Label.$Content,Label,True,True,,
+TestApp.g.en-US.resources:mainwindow.baml,ToolBar_1:System.Windows.Controls.ToolBar.$Content,Menu,True,True,,#Button_1;#Separator_1;#StartStopToggleButton;#Separator_2;#Label_2;#ComboBox_1;
+TestApp.g.en-US.resources:mainwindow.baml,Button_1:System.Windows.Controls.Button.$Content,Button,True,True,,
+TestApp.g.en-US.resources:mainwindow.baml,StartStopToggleButton:System.Windows.Controls.Primitives.ToggleButton.$Content,Button,True,True,,
+TestApp.g.en-US.resources:mainwindow.baml,Label_2:System.Windows.Controls.Label.$Content,Label,True,True,,言語選択
+TestApp.g.en-US.resources:mainwindow.baml,ComboBox_1:System.Windows.Controls.ComboBox.$Content,ComboBox,True,True,,
+TestApp.g.en-US.resources:mainwindow.baml,TextBlock_1:System.Windows.Controls.TextBlock.$Content,Text,True,True,,#Run_1; (#Run_2;)
+TestApp.g.en-US.resources:mainwindow.baml,Run_1:System.Windows.Documents.Run.$Content,Text,True,True,,
+TestApp.g.en-US.resources:mainwindow.baml,Run_2:System.Windows.Documents.Run.$Content,Text,True,True,,
+TestApp.g.en-US.resources:mainwindow.baml,Label_3:System.Windows.Controls.Label.$Content,Label,True,True,,言語選択のテスト用ラベル

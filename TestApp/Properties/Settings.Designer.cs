@@ -27,8 +27,8 @@ namespace TestApp.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>en</string>
-  <string>ja</string>
+  <string>en-US</string>
+  <string>ja-JP</string>
   <string>zh</string>
   <string>pt</string>
   <string>ru</string>
