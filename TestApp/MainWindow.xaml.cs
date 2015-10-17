@@ -114,6 +114,13 @@ namespace TestApp
             }
         }
 
+        private void onToolButtonClick(object sender, RoutedEventArgs e)
+        {
+            ToolWindow win = new ToolWindow();
+            win.Owner = this;
+            win.Show();
+        }
+
         void raisePropertyChanged(string name)
         {
             if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(name)); }

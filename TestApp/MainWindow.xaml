@@ -97,6 +97,8 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+            
+            <Button Click="onToolButtonClick">Tool</Button>
         </ToolBar>
         <Grid x:Uid="Grid_2" Grid.Row="1">
             <Grid.ColumnDefinitions>
