@@ -10,18 +10,13 @@
         <DataGrid Grid.Row="0" Margin="5" AutoGenerateColumns="False"
                   ItemsSource="{Binding Path=CultureInfoList}">
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="LCID" SortMemberPath="LCID">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=LCID}" HorizontalAlignment="Right" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <TextBox Text="{Binding Path=LCID}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding Path=LCID}" Header="LCID">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="FrameworkElement">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name" />
                 <DataGridTextColumn Binding="{Binding Path=DisplayName, Mode=OneWay}" Header="DisplayName" />
                 <DataGridTextColumn Binding="{Binding Path=NativeName, Mode=OneWay}" Header="NativeName" />
