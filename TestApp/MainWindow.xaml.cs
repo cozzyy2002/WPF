@@ -133,5 +133,10 @@ namespace TestApp
         {
             Settings.Save();
         }
+
+        private void onVideoAreaSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if(VideoPreview != null) VideoPreview.setSize(e.NewSize);
+        }
     }
 }

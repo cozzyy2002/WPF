@@ -7,6 +7,7 @@
 
 using namespace DirectX;
 using namespace System;
+using namespace System::Windows;
 using namespace System::Windows::Controls;
 using namespace System::Windows::Threading;
 
@@ -123,6 +124,15 @@ void CVideoPreview::setup(IntPtr hwnd, double width, double height)
 
 	} catch(Exception^ ex) {
 		Console::WriteLine("Exception: ", ex->Message);
+	}
+}
+
+void CVideoPreview::setSize(Size size)
+{
+	if(this->pVideoWindow) {
+		this->pVideoWindow->SetWindowPosition(0, 0, (long)size.Width, (long)size.Height);
+		this->hWndHost->Width = size.Width;
+		this->hWndHost->Height = size.Height;
 	}
 }
 

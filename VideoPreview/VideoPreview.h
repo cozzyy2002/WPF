@@ -17,6 +17,7 @@ namespace DirectX {
 		!CVideoPreview();
 
 		void setup(System::Windows::Controls::Decorator^ parent);
+		void setSize(System::Windows::Size size);
 		void start();
 		void stop();
 

@@ -106,6 +106,6 @@
             </Grid.ColumnDefinitions>
             <Label x:Uid="Label_3" Grid.Column="1">Culture selection test label</Label>
         </Grid>
-        <Border x:Uid="VideoArea" Grid.Row="2" Name="VideoArea" />
+        <Border x:Uid="VideoArea" Grid.Row="2" Name="VideoArea" SizeChanged="onVideoAreaSizeChanged" />
     </Grid>
 </Window>
