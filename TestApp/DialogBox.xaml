@@ -1,13 +1,12 @@
 ﻿<Window x:Class="TestApp.DialogBox"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="{Binding XPath=Title}" Height="300" Width="300"
-        DataContext="{Binding Path=SelectedItem, ElementName=ContentsSelection}">
+        Icon="{Binding XPath=Icon}" Title="{Binding XPath=Title}" Height="300" Width="300">
     <Window.Resources>
         <XmlDataProvider x:Key="Contents" XPath="Contents">
             <x:XData>
                 <Contents xmlns="">
-                    <Type Name="Progress">
+                    <Type Name="Progress" Default="True">
                         <Title>実行中</Title>
                         <Message>..... 実行中です</Message>
                         <Icon>/Resources/Start.png</Icon>
@@ -21,18 +20,29 @@
             </x:XData>
         </XmlDataProvider>
     </Window.Resources>
+    <Window.Style>
+        <Style TargetType="Window">
+            <!--<Setter Property="DataContext" Value="{Binding XPath=Type[@Name\=\'Progress\'], Source={StaticResource Contents}}" />-->
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=DialogType, RelativeSource={RelativeSource Mode=Self}}" Value="Progress">
+                    <Setter Property="DataContext" Value="{Binding XPath=Type[@Name\=\'Progress\'], Source={StaticResource Contents}}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=DialogType, RelativeSource={RelativeSource Mode=Self}}" Value="Error">
+                    <Setter Property="DataContext" Value="{Binding XPath=Type[@Name\=\'Error\'], Source={StaticResource Contents}}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ComboBox Grid.Row="0" Name="ContentsSelection"
-                  ItemsSource="{Binding XPath=Type, Source={StaticResource Contents}}"
-                  DisplayMemberPath="@Name"
-                  SelectedIndex="0"/>
         <TextBlock Grid.Row="1">
             <Image Source="{Binding XPath=Icon}" Stretch="None" />
             <Run Text="{Binding XPath=Message}" />
         </TextBlock>
+        <Button Grid.Row="2" Click="onTestButtonClick">test</Button>
     </Grid>
 </Window>
