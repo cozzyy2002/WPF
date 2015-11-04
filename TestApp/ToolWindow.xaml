@@ -1,13 +1,34 @@
 ﻿<Window x:Class="TestApp.ToolWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TestApp"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="ToolWindow" Height="300" MinWidth="300"
         ResizeMode="CanResizeWithGrip" SizeToContent="Width" ShowInTaskbar="False">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="0" Margin="5" AutoGenerateColumns="False"
+        <Grid.Resources>
+            <!--<ObjectDataProvider x:Key="DialogBoxTypes"
+                                ObjectType="{x:Type sys:Enum}" MethodName="GetNames">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:DialogBoxType" />
+                </ObjectDataProvider.MethodParameters>                
+            </ObjectDataProvider>-->
+        </Grid.Resources>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0"
+                      ItemsSource="{Binding Path=DialogBoxTypes}"
+                      SelectedItem="{Binding Path=DialogBoxType}" />
+            <Button Grid.Column="1" Click="onShowButtonClick">Show</Button>
+        </Grid>
+        <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False"
                   ItemsSource="{Binding Path=CultureInfoList}">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=LCID}" Header="LCID">

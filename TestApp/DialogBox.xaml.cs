@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace TestApp
 {
-    public enum DialogType
+    public enum DialogBoxType
     {
         Progress, Error
     }
@@ -13,14 +13,14 @@ namespace TestApp
     /// </summary>
     public partial class DialogBox : Window
     {
-        public DialogBox(DialogType type)
+        public DialogBox(DialogBoxType type)
         {
             this.DialogType = type;
 
             InitializeComponent();
         }
 
-        public DialogType DialogType { get; protected set; }
+        public DialogBoxType DialogType { get; protected set; }
 
         private void onTestButtonClick(object sender, RoutedEventArgs e)
         {

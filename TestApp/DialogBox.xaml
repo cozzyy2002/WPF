@@ -22,7 +22,6 @@
     </Window.Resources>
     <Window.Style>
         <Style TargetType="Window">
-            <!--<Setter Property="DataContext" Value="{Binding XPath=Type[@Name\=\'Progress\'], Source={StaticResource Contents}}" />-->
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=DialogType, RelativeSource={RelativeSource Mode=Self}}" Value="Progress">
                     <Setter Property="DataContext" Value="{Binding XPath=Type[@Name\=\'Progress\'], Source={StaticResource Contents}}" />

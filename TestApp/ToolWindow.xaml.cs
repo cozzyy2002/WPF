@@ -27,6 +27,8 @@ namespace TestApp
             this.DataContext = this;
             this.Settings = Properties.Settings.Default;
 
+            this.DialogBoxTypes = new List<DialogBoxType>(
+                Enum.GetValues(typeof(DialogBoxType)).Cast<DialogBoxType>());
             this.CultureInfoList = new List<CultureInfo>(
                     Settings.Cultures.Cast<string>().Select<string, CultureInfo>(name => new CultureInfo(name))
                 );
@@ -34,6 +36,8 @@ namespace TestApp
 
         public Properties.Settings Settings { get; protected set; }
 
+        public List<DialogBoxType> DialogBoxTypes { get; protected set; }
+        public DialogBoxType DialogBoxType { get; set; }
         public List<CultureInfo> CultureInfoList { get; protected set; }
 
         public class CultureInfo : INotifyPropertyChanged
@@ -88,6 +92,11 @@ namespace TestApp
             System.Globalization.CultureInfo inner = null;
 
             public event PropertyChangedEventHandler PropertyChanged;
+        }
+
+        private void onShowButtonClick(object sender, RoutedEventArgs e)
+        {
+            new DialogBox(DialogBoxType).Show();
         }
     }
 }
