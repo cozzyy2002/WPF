@@ -5,8 +5,9 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="ToolWindow" Height="300" MinWidth="300"
         ResizeMode="CanResizeWithGrip" SizeToContent="Width" ShowInTaskbar="False">
-    <Grid>
+    <Grid Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -21,14 +22,25 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition SharedSizeGroup="Buttons" />
             </Grid.ColumnDefinitions>
             <ComboBox Grid.Column="0"
                       ItemsSource="{Binding Path=DialogBoxTypes}"
                       SelectedItem="{Binding Path=DialogBoxType}" />
             <Button Grid.Column="1" Click="onShowButtonClick">Show</Button>
         </Grid>
-        <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False"
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition SharedSizeGroup="Buttons" /> <!-- Not used -->
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="CultureInfoFormat" />
+            <Label Grid.Column="1" Name="CultureInfoText"
+                   Content="{Binding ElementName=CultureInfoTable, Path=SelectedItem}"
+                   ContentStringFormat="{Binding ElementName=CultureInfoFormat, Path=Text}"/>
+        </Grid>
+        <DataGrid Grid.Row="2" Name="CultureInfoTable" Margin="5" AutoGenerateColumns="False"
                   ItemsSource="{Binding Path=CultureInfoList}">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=LCID}" Header="LCID">

@@ -40,7 +40,7 @@ namespace TestApp
         public DialogBoxType DialogBoxType { get; set; }
         public List<CultureInfo> CultureInfoList { get; protected set; }
 
-        public class CultureInfo : INotifyPropertyChanged
+        public class CultureInfo : INotifyPropertyChanged, IFormattable
         {
             public CultureInfo() { }
             public CultureInfo(string name) { this.Name = name; }
@@ -91,7 +91,26 @@ namespace TestApp
 
             System.Globalization.CultureInfo inner = null;
 
+            #region Implementation of INotifyPropertyChanged
             public event PropertyChangedEventHandler PropertyChanged;
+            #endregion
+
+            #region Implemetation of IFormattable
+            public string ToString(string format, IFormatProvider formatProvider)
+            {
+                if (!string.IsNullOrEmpty(format))
+                {
+                    switch (format[0])
+                    {
+                        case 'L': return LCID.ToString(format.Substring(1), formatProvider);
+                        case 'D': return DisplayName;
+                        case 'E': return EnglishName;
+                        case 'N': return NativeName;
+                    }
+                }
+                return Name;
+            }
+            #endregion
         }
 
         private void onShowButtonClick(object sender, RoutedEventArgs e)
