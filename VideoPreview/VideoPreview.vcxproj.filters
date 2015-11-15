@@ -27,6 +27,9 @@
     <ClInclude Include="HWndHostControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VideoPreview.cpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HWndHostControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

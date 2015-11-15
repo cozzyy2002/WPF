@@ -36,7 +36,10 @@ namespace TestApp
                 this.Cultures.Add(new CultureInfo(s));
             }
 
+            this.DeviceCategories = new List<DirectX.CDevice.CCategory>(DirectX.CDevice.Categories);
         }
+
+        public List<DirectX.CDevice.CCategory> DeviceCategories { get; protected set; }
 
         public DirectX.CVideoPreview VideoPreview {
             get { return videoPreview; }

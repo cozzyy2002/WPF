@@ -70,6 +70,7 @@
         <Grid.RowDefinitions>
             <RowDefinition x:Uid="RowDefinition_1" Height="Auto" />
             <RowDefinition x:Uid="RowDefinition_2" Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition x:Uid="RowDefinition_3" Height="*" />
         </Grid.RowDefinitions>
         <ToolBar x:Uid="ToolBar_1" Grid.Row="0">
@@ -106,6 +107,17 @@
             </Grid.ColumnDefinitions>
             <Label x:Uid="Label_3" Grid.Column="1">Culture selection test label</Label>
         </Grid>
-        <Border x:Uid="VideoArea" Grid.Row="2" Name="VideoArea" SizeChanged="onVideoAreaSizeChanged" />
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0">Category</Label>
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding Path=DeviceCategories}"
+                      SelectedItem="VideoInputDeviceCategory"/>
+        </Grid>
+        <Border x:Uid="VideoArea" Grid.Row="3" Name="VideoArea" SizeChanged="onVideoAreaSizeChanged" />
     </Grid>
 </Window>
