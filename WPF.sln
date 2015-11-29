@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoPreview", "VideoPreview\VideoPreview.vcxproj", "{EA941EEE-C971-4583-BE71-BA94D2818F5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,16 @@ Global
 		{EA941EEE-C971-4583-BE71-BA94D2818F5A}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{EA941EEE-C971-4583-BE71-BA94D2818F5A}.Release|Win32.ActiveCfg = Release|Win32
 		{EA941EEE-C971-4583-BE71-BA94D2818F5A}.Release|Win32.Build.0 = Release|Win32
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
