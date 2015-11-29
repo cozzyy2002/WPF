@@ -111,12 +111,17 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0">Category</Label>
-            <ComboBox Grid.Column="1"
+            <ComboBox Grid.Column="1" Name="DiviceCategory"
                       ItemsSource="{Binding Path=DeviceCategories}"
-                      SelectedItem="VideoInputDeviceCategory"/>
+                      SelectedItem="{Binding Path=SelectedCategory}"/>
+            <Label Grid.Column="2">Device</Label>
+            <ComboBox Grid.Column="3"
+                      ItemsSource="{Binding Path=Devices}"
+                      SelectedItem="{Binding Path=CameraDevice}"/>
         </Grid>
         <Border x:Uid="VideoArea" Grid.Row="3" Name="VideoArea" SizeChanged="onVideoAreaSizeChanged" />
     </Grid>

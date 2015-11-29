@@ -31,7 +31,28 @@ namespace DirectX {
 		static property CCategory^ AudioRendererCategory { CCategory^ get(); }
 		static property ICollection<CCategory^>^ Categories { ICollection<CCategory^>^ get(); }
 
-		CDevice();
-	};
+		static ICollection<CDevice^>^ getDevices(CCategory^ category);
 
+		CDevice(IMoniker* pMoniker, CCategory^ category);
+		~CDevice() { this->!CDevice(); }
+		!CDevice() { if(this->m_pMoniker) this->m_pMoniker->Release(); }
+
+		property CCategory^ Category { CCategory^ get() { return m_category; } }
+		property String^ FriendlyName{ String^ get() { return m_friendlyName; } }
+		property String^ Description{ String^ get() { return m_description; } }
+		property String^ DevicePath{ String^ get() { return m_devicePath; } }
+		bool Is(CCategory^ category) { return this->Category->getClsId() == category->getClsId(); }
+		IMoniker* getMoniker() { return m_pMoniker; }
+
+		String^ ToString() override { return FriendlyName; }
+
+	protected:
+		IMoniker* m_pMoniker;
+		CCategory^ m_category;
+		String^ m_friendlyName;
+		String^ m_description;
+		String^ m_devicePath;
+
+		String^ getStringProperty(IPropertyBag* pb, LPCWSTR name);
+	};
 }

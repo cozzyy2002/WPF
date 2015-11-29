@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading;
@@ -37,9 +38,53 @@ namespace TestApp
             }
 
             this.DeviceCategories = new List<DirectX.CDevice.CCategory>(DirectX.CDevice.Categories);
+            this.selectedCategory = DirectX.CDevice.VideoInputDeviceCategory;
+            this.Devices = new ObservableCollection<DirectX.CDevice>();
         }
 
         public List<DirectX.CDevice.CCategory> DeviceCategories { get; protected set; }
+        public DirectX.CDevice.CCategory SelectedCategory
+        {
+            get { return selectedCategory; }
+            set
+            {
+                Devices.Clear();
+                selectedCategory = value;
+                foreach (DirectX.CDevice dev in DirectX.CDevice.getDevices(value))
+                {
+                    Console.WriteLine("  " + dev.FriendlyName);
+                    Devices.Add(dev);
+                }
+                CameraDevice = (0 < Devices.Count) ? Devices[0] : null;
+            }
+        }
+        DirectX.CDevice.CCategory selectedCategory;
+
+        public ObservableCollection<DirectX.CDevice> Devices { get; set; }
+
+        public DirectX.CDevice CameraDevice {
+            get { return cameraDevice; }
+            set
+            {
+                if (VideoPreview != null)
+                {
+                    VideoPreview.Dispose();
+                    VideoPreview = null;
+                }
+                if (value != null)
+                {
+                    Console.WriteLine("Camera device: {0}", value.FriendlyName);
+                    if (value.Is(DirectX.CDevice.VideoInputDeviceCategory))
+                    {
+                        cameraDevice = value;
+                        VideoPreview = new DirectX.CVideoPreview();
+                        VideoPreview.setup(CameraDevice, VideoArea);
+                    }
+                }
+                raisePropertyChanged("CameraDevice");
+            }
+        }
+        DirectX.CDevice cameraDevice;
 
         public DirectX.CVideoPreview VideoPreview {
             get { return videoPreview; }
@@ -95,13 +140,7 @@ namespace TestApp
             get { return (videoPreview != null) ? videoPreview.IsStarted : false; }
             set
             {
-                if (IsCameraActive == value) return;
-
-                if (VideoPreview == null)
-                {
-                    VideoPreview = new DirectX.CVideoPreview();
-                    VideoPreview.setup(VideoArea);
-                }
+                if ((IsCameraActive == value) || (VideoPreview ==null)) return;
 
                 if (value)
                 {

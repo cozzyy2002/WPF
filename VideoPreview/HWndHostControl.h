@@ -21,20 +21,4 @@ namespace Win32 {
 
 		System::Windows::Controls::Decorator^ parent;
 	};
-
-
-	// Exception thrown when FAILED(hr)
-	public ref class ComOperationFailedException : public System::Exception {
-	internal:
-		ComOperationFailedException(System::String^ message, HRESULT hr)
-			: Exception(message), hr(hr) {}
-
-	public:
-		property long HResult {
-			long get() { return hr; }
-		}
-
-	protected:
-		HRESULT hr;
-	};
 }

@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "VideoPreview.h"
+#include "Win32.h"
 
 #pragma comment(lib, "Strmiids")
 
@@ -10,16 +11,6 @@ using namespace System;
 using namespace System::Windows;
 using namespace System::Windows::Controls;
 using namespace System::Windows::Threading;
-
-#define HRESULT_CHECK(method) hResultCheck(method, #method)
-
-static HRESULT hResultCheck(HRESULT hr, String^ method)
-{
-	if(FAILED(hr)) {
-		throw gcnew Win32::ComOperationFailedException(String::Format("'{1}' failed. error=0x{0:x}", hr, method), hr);
-	}
-	return hr;
-}
 
 CVideoPreview::CVideoPreview(void) : isStarted(false)
 {
@@ -55,7 +46,7 @@ CVideoPreview::!CVideoPreview()
  *
  * Call this method on Load event of host window
  */
-void CVideoPreview::setup(Decorator^ parent)
+void CVideoPreview::setup(CDevice^ camera, Decorator^ parent)
 {
 	// Create control to host video window
 	hWndHost = gcnew Win32::CHWndHostControl();
@@ -67,8 +58,8 @@ void CVideoPreview::setup(Decorator^ parent)
 
 	setupResult = Dispatcher::CurrentDispatcher->BeginInvoke(
 		DispatcherPriority::SystemIdle,
-		gcnew Action<IntPtr, double, double>(this, &CVideoPreview::setup),
-		hwnd, width, height);
+		gcnew Action<CDevice^, IntPtr, double, double>(this, &CVideoPreview::setup),
+		camera, hwnd, width, height);
 
 	Console::WriteLine("Video window is created.");
 }
@@ -76,7 +67,7 @@ void CVideoPreview::setup(Decorator^ parent)
 /**
  * Setup COM objects for DirectShow
  */
-void CVideoPreview::setup(IntPtr hwnd, double width, double height)
+void CVideoPreview::setup(CDevice^ camera, IntPtr hwnd, double width, double height)
 {
 	try {
 		// Initialize Filter Graph Manager and Capture Graph Manager
@@ -86,20 +77,9 @@ void CVideoPreview::setup(IntPtr hwnd, double width, double height)
 		HRESULT_CHECK(pBuild.CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC_SERVER));
 		HRESULT_CHECK(pBuild->SetFiltergraph(pGraph));
 
-		// Find a camera device
-		CComPtr<ICreateDevEnum> pDevEnum;
-		HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER));
-		CComPtr<IEnumMoniker> pEnum;
-		if(S_OK != HRESULT_CHECK(pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0))) {
-			Console::WriteLine("Video input device is not found.");
-			return;
-		}
-		CComPtr<IMoniker> pMoniker;
-		HRESULT_CHECK(pEnum->Next(1, &pMoniker, NULL));
-
 		// Create capture filter for the camera device
 		CComPtr<IBaseFilter> pCap;
-		HRESULT_CHECK(pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&pCap));
+		HRESULT_CHECK(camera->getMoniker()->BindToObject(0, 0, IID_IBaseFilter, (void**)&pCap));
 
 		// Connect filters in the Filter Graph
 		HRESULT_CHECK(pGraph->AddFilter(pCap, NULL));

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "HWndHostControl.h"
+#include "Device.h"
 
 using namespace System;
 
@@ -16,7 +17,7 @@ namespace DirectX {
 		~CVideoPreview();
 		!CVideoPreview();
 
-		void setup(System::Windows::Controls::Decorator^ parent);
+		void setup(CDevice^ camera, System::Windows::Controls::Decorator^ parent);
 		void setSize(System::Windows::Size size);
 		void start();
 		void stop();
@@ -42,7 +43,7 @@ namespace DirectX {
 
 		bool isStarted;
 
-		void setup(IntPtr hwnd, double width, double height);
+		void setup(CDevice^ camera, IntPtr hwnd, double width, double height);
 		void onPropertyChanged(System::String^ name, System::Object^ value)
 		{
 			Console::WriteLine("Property '{0}' is changed: {1}", name, value);
