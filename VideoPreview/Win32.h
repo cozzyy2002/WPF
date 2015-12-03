@@ -8,9 +8,9 @@ namespace Win32 {
 
 	// Exception thrown when FAILED(hr)
 	public ref class ComOperationFailedException : public System::Exception {
-	internal:
+	public:
 		ComOperationFailedException(System::String^ message, HRESULT hr)
-			: Exception(message), hr(hr) {}
+			: Exception(message, System::Runtime::InteropServices::Marshal::GetExceptionForHR(hr)) { }
 
 	public:
 		property long HResult {
