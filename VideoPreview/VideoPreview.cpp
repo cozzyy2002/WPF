@@ -69,6 +69,10 @@ void CVideoPreview::setup(CDevice^ camera, Decorator^ parent)
  */
 void CVideoPreview::setup(CDevice^ camera, IntPtr hwnd, double width, double height)
 {
+	if(!camera->Is(CDevice::VideoInputDeviceCategory)) {
+		throw gcnew Exception(String::Format("'{0}' is not {1}", camera->FriendlyName, CDevice::VideoInputDeviceCategory->Name));
+	}
+
 	try {
 		// Initialize Filter Graph Manager and Capture Graph Manager
 		CComPtr<IGraphBuilder> pGraph;

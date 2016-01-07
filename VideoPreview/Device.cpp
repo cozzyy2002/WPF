@@ -38,7 +38,7 @@ using namespace System::Collections::Generic;
 	HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER));
 	CComPtr<IEnumMoniker> pEnum;
 	if(S_OK != HRESULT_CHECK(pDevEnum->CreateClassEnumerator(category->getClsId(), &pEnum, 0))) {
-		Console::WriteLine("Video input device is not found.");
+		Console::WriteLine("Device is not found: {0}", category->Name);
 		return list;
 	}
 	CComPtr<IMoniker> pMoniker;
