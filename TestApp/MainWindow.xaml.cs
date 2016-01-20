@@ -128,8 +128,23 @@ namespace TestApp
             public void Execute(object parameter)
             {
                 // Start/Stop preview by calling IsCameraActiveChanged callback
-                mainWindow.IsCameraActive = !mainWindow.IsCameraActive;
+                //mainWindow.IsCameraActive = !mainWindow.IsCameraActive;
+
+                if (audioPlayer == null)
+                {
+                    audioPlayer = new DirectX.CAudioPlayer();
+                    audioPlayer.setup(@"C:\Windows\Media\ringout.wav");
+                    audioPlayer.start();
+                }
+                else
+                {
+                    audioPlayer.stop();
+                    audioPlayer.Dispose();
+                    audioPlayer = null;
+                }
             }
+
+            DirectX.CAudioPlayer audioPlayer = null;
         }
 
         /// <summary>

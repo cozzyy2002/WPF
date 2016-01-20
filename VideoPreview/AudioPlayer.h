@@ -15,6 +15,10 @@ namespace DirectX {
 	protected:
 		IGraphBuilder *pGraph;
 		IMediaControl* pControl;
+		IMediaSeeking* pSeeking;
+
+		HANDLE hShutdown;
+		void handleMediaEvent(System::Object ^sender, System::ComponentModel::DoWorkEventArgs ^e);
 	};
 
 }
