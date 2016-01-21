@@ -8,33 +8,11 @@ using namespace System::ComponentModel;
 using namespace DirectX;
 using namespace System;
 
-CAudioPlayer::CAudioPlayer()
-	: pGraph(NULL), pControl(NULL), pSeeking(NULL)
+CAudioPlayer::CAudioPlayer(System::String^ mediaFile)
+	: mediaFile(mediaFile), pGraph(NULL), pControl(NULL), pSeeking(NULL)
 {
-	hShutdown = CreateEvent(NULL, TRUE, FALSE, NULL);
-}
+	hStop = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-CAudioPlayer::~CAudioPlayer()
-{
-	this->!CAudioPlayer();
-}
-
-CAudioPlayer::!CAudioPlayer()
-{
-	// Tell worker thread to terminate
-	::SetEvent(hShutdown);
-
-	if(pControl) {
-		pControl->Stop();
-		pControl->Release();
-	}
-
-	if(pSeeking) pSeeking->Release();
-	if(pGraph) pGraph->Release();
-}
-
-void CAudioPlayer::setup(System::String^ mediaFile)
-{
 	try {
 		CComPtr<IGraphBuilder> pGraph;
 		HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER));
@@ -52,13 +30,51 @@ void CAudioPlayer::setup(System::String^ mediaFile)
 		this->pGraph = pGraph.Detach();
 		this->pControl = pControl.Detach();
 		this->pSeeking = pSeeking.Detach();
-
-		BackgroundWorker^ worker = gcnew BackgroundWorker();
-		worker->DoWork += gcnew DoWorkEventHandler(this, &CAudioPlayer::handleMediaEvent);
-		worker->RunWorkerAsync();
 	} catch(Exception^ ex) {
 		Console::WriteLine("Exception: {0}", ex->Message);
 	}
+}
+
+CAudioPlayer::~CAudioPlayer()
+{
+	this->!CAudioPlayer();
+}
+
+CAudioPlayer::!CAudioPlayer()
+{
+	this->stop();
+
+	if(pControl) {
+		pControl->Stop();
+		pControl->Release();
+	}
+
+	if(pSeeking) pSeeking->Release();
+	if(pGraph) pGraph->Release();
+}
+
+void CAudioPlayer::start(bool repeat, unsigned int interval)
+{
+	this->repeat = repeat;
+	this->interval = interval;
+	::ResetEvent(hStop);
+
+	try {
+		BackgroundWorker^ worker = gcnew BackgroundWorker();
+		worker->DoWork += gcnew DoWorkEventHandler(this, &CAudioPlayer::handleMediaEvent);
+		worker->RunWorkerAsync();
+
+		HRESULT_CHECK(pControl->Run());
+	} catch(Exception^ ex) {
+		Console::WriteLine("Exception: {0}", ex->Message);
+	}
+}
+
+void CAudioPlayer::stop()
+{
+	// Tell worker thread to terminate
+	::SetEvent(hStop);
+	HRESULT_CHECK(pControl->Stop());
 }
 
 void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
@@ -66,16 +82,15 @@ void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 	try {
 		CComPtr<IMediaEvent> pEvent;
 		HRESULT_CHECK(pGraph->QueryInterface(IID_IMediaEvent, (void**)&pEvent));
-		HANDLE hEvents[] = {hShutdown, 0};
+		HANDLE hEvents[] = {hStop, 0};
 		HRESULT_CHECK(pEvent->GetEventHandle((OAEVENT*)&hEvents[1]));
 
-		bool exit = false;
+		bool exit = true;
 		do {
 			DWORD wait = ::WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, FALSE, INFINITE);
 			switch(wait) {
 			case WAIT_OBJECT_0:
-				// hShutdown is set
-				exit = true;
+				// hStop is set
 				break;
 			case WAIT_OBJECT_0 + 1:
 				// Media event occurs
@@ -85,8 +100,18 @@ void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 					HRESULT_CHECK(pEvent->GetEvent(&eventCode, &lParam1, &lParam2, INFINITE));
 					switch(eventCode) {
 					case EC_COMPLETE:
-						LONGLONG current = 0;
-						pSeeking->SetPositions(&current, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+						if(repeat) {
+							if(interval) {
+								wait = ::WaitForSingleObject(hStop, interval);
+								if(wait == WAIT_OBJECT_0) break;
+							}
+							LONGLONG current = 0;
+							HRESULT_CHECK(pSeeking->SetPositions(&current, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning));
+							exit = false;
+						}
+						break;
+					default:
+						exit = false;
 						break;
 					}
 					HRESULT_CHECK(pEvent->FreeEventParams(eventCode, lParam1, lParam2));
@@ -94,22 +119,10 @@ void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 				break;
 			default:
 				Console::WriteLine("Unexpected wait result: {0}", wait);
-				exit = true;
 				break;
 			}
 		} while(!exit);
 	} catch(Exception^ ex) {
 		Console::WriteLine("Exception: {0}", ex->Message);
 	}
-}
-
-void CAudioPlayer::start()
-{
-	HRESULT_CHECK(pControl->Run());
-}
-
-void CAudioPlayer::stop()
-{
-	::SetEvent(hShutdown);
-	HRESULT_CHECK(pControl->Stop());
 }

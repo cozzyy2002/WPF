@@ -132,9 +132,11 @@ namespace TestApp
 
                 if (audioPlayer == null)
                 {
-                    audioPlayer = new DirectX.CAudioPlayer();
-                    audioPlayer.setup(@"C:\Windows\Media\ringout.wav");
-                    audioPlayer.start();
+                    audioPlayer = new DirectX.CAudioPlayer(
+                        @"C:\Windows\Media\ringout.wav"
+                        //@"C:\cozzy\Music\Al DiMeola\Elegant Gypsy\01 Flight over Rio.wma"
+                        );
+                    audioPlayer.start(true, 1000);
                 }
                 else
                 {

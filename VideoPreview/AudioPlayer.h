@@ -4,20 +4,25 @@ namespace DirectX {
 
 	public ref class CAudioPlayer {
 	public:
-		CAudioPlayer();
+		CAudioPlayer(System::String^ mediaFile);
 		~CAudioPlayer();
 		!CAudioPlayer();
 
-		void setup(System::String^ mediaFile);
-		void start();
+		void start(bool repeat, unsigned int interval);
+		void start(bool repeat) { start(repeat, 0); }
+		void start() { start(false); }
 		void stop();
 
 	protected:
+		System::String^ mediaFile;
+		bool repeat;
+		unsigned int interval;
+
 		IGraphBuilder *pGraph;
 		IMediaControl* pControl;
 		IMediaSeeking* pSeeking;
 
-		HANDLE hShutdown;
+		HANDLE hStop;
 		void handleMediaEvent(System::Object ^sender, System::ComponentModel::DoWorkEventArgs ^e);
 	};
 
