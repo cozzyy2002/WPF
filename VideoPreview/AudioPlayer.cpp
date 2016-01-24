@@ -79,50 +79,52 @@ void CAudioPlayer::stop()
 
 void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 {
-	try {
-		CComPtr<IMediaEvent> pEvent;
-		HRESULT_CHECK(pGraph->QueryInterface(IID_IMediaEvent, (void**)&pEvent));
-		HANDLE hEvents[] = {hStop, 0};
-		HRESULT_CHECK(pEvent->GetEventHandle((OAEVENT*)&hEvents[1]));
+	CComPtr<IMediaEvent> pEvent;
+	HRESULT_CHECK(pGraph->QueryInterface(IID_IMediaEvent, (void**)&pEvent));
+	HANDLE hEvents[] = {hStop, 0};
+	HRESULT_CHECK(pEvent->GetEventHandle((OAEVENT*)&hEvents[1]));
 
-		bool exit = true;
-		do {
-			DWORD wait = ::WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, FALSE, INFINITE);
-			switch(wait) {
-			case WAIT_OBJECT_0:
-				// hStop is set
-				break;
-			case WAIT_OBJECT_0 + 1:
-				// Media event occurs
-				{
-					long eventCode;
-					LONG_PTR lParam1, lParam2;
-					HRESULT_CHECK(pEvent->GetEvent(&eventCode, &lParam1, &lParam2, INFINITE));
-					switch(eventCode) {
-					case EC_COMPLETE:
-						if(repeat) {
-							if(interval) {
-								wait = ::WaitForSingleObject(hStop, interval);
-								if(wait == WAIT_OBJECT_0) break;
-							}
-							LONGLONG current = 0;
-							HRESULT_CHECK(pSeeking->SetPositions(&current, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning));
-							exit = false;
+	bool exit = true;
+	do {
+		// Wait for stop() method called or completed to play back
+		DWORD wait = ::WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, FALSE, INFINITE);
+		switch(wait) {
+		case WAIT_OBJECT_0:
+			// stop() method called
+			break;
+		case WAIT_OBJECT_0 + 1:
+			// Media event occurs
+			long eventCode;
+			LONG_PTR lParam1, lParam2;
+			try {
+				HRESULT_CHECK(pEvent->GetEvent(&eventCode, &lParam1, &lParam2, INFINITE));
+				switch(eventCode) {
+				case EC_COMPLETE:
+					// Completed to play back
+					if(repeat) {
+						if(interval) {
+							wait = ::WaitForSingleObject(hStop, interval);
+							if(wait == WAIT_OBJECT_0) break;
 						}
-						break;
-					default:
+						// Seek to top of stream
+						LONGLONG current = 0;
+						HRESULT_CHECK(pSeeking->SetPositions(&current, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning));
 						exit = false;
-						break;
 					}
-					HRESULT_CHECK(pEvent->FreeEventParams(eventCode, lParam1, lParam2));
+					break;
+				default:
+					// Ignore other media event
+					exit = false;
+					break;
 				}
-				break;
-			default:
-				Console::WriteLine("Unexpected wait result: {0}", wait);
-				break;
+			} catch(Exception^ ex) {
+				Console::WriteLine("Exception: {0}", ex->Message);
 			}
-		} while(!exit);
-	} catch(Exception^ ex) {
-		Console::WriteLine("Exception: {0}", ex->Message);
-	}
+			HRESULT_CHECK(pEvent->FreeEventParams(eventCode, lParam1, lParam2));
+			break;
+		default:
+			Console::WriteLine("Unexpected wait result: {0}", wait);
+			break;
+		}
+	} while(!exit);
 }
