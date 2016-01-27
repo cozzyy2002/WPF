@@ -140,8 +140,13 @@ namespace TestApp
                     {
                         if (!audioPlayer.IsPlaying)
                         {
-                            Thread.Sleep(2000);
-                            audioPlayer.rewind();
+                            BackgroundWorker worker = new BackgroundWorker();
+                            worker.DoWork += (object sender, DoWorkEventArgs ev) => {
+                                Thread.Sleep(2000);
+                                audioPlayer.rewind();
+                                audioPlayer.start();
+                            };
+                            worker.RunWorkerAsync();
                         }
                     };
                     audioPlayer.start();
