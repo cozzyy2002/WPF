@@ -2,21 +2,34 @@
 
 namespace DirectX {
 
-	public ref class CAudioPlayer {
+	public ref class CAudioPlayer : public System::ComponentModel::INotifyPropertyChanged {
 	public:
 		CAudioPlayer(System::String^ mediaFile);
 		~CAudioPlayer();
 		!CAudioPlayer();
 
-		void start(bool repeat, unsigned int interval);
-		void start(bool repeat) { start(repeat, 0); }
-		void start() { start(false); }
+		void start();
 		void stop();
+		void rewind();
+
+		property bool IsPlaying {
+			bool get() { return isPlaying; }
+		}
+		virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged;
 
 	protected:
 		System::String^ mediaFile;
-		bool repeat;
-		unsigned int interval;
+		bool isPlaying;
+		void setIsPlaying(bool value) {
+			if(isPlaying != value) {
+				isPlaying = value;
+				PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs("IsPlaying"));
+			}
+		}
+
+		void onPlayingCompleted() { setIsPlaying(false); }
+
+		System::Windows::Threading::Dispatcher^ dispatcher;
 
 		IGraphBuilder *pGraph;
 		IMediaControl* pControl;

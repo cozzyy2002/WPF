@@ -136,7 +136,15 @@ namespace TestApp
                         @"C:\Windows\Media\ringout.wav"
                         //@"C:\cozzy\Music\Al DiMeola\Elegant Gypsy\01 Flight over Rio.wma"
                         );
-                    audioPlayer.start(true, 1000);
+                    audioPlayer.PropertyChanged += (object s, PropertyChangedEventArgs e) =>
+                    {
+                        if (!audioPlayer.IsPlaying)
+                        {
+                            Thread.Sleep(2000);
+                            audioPlayer.rewind();
+                        }
+                    };
+                    audioPlayer.start();
                 }
                 else
                 {

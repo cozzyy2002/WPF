@@ -7,9 +7,12 @@
 using namespace System::ComponentModel;
 using namespace DirectX;
 using namespace System;
+using namespace System::Windows::Threading;
 
 CAudioPlayer::CAudioPlayer(System::String^ mediaFile)
-	: mediaFile(mediaFile), pGraph(NULL), pControl(NULL), pSeeking(NULL)
+	: mediaFile(mediaFile)
+	, dispatcher(Dispatcher::CurrentDispatcher)
+	, pGraph(NULL), pControl(NULL), pSeeking(NULL)
 {
 	hStop = CreateEvent(NULL, TRUE, FALSE, NULL);
 
@@ -53,10 +56,11 @@ CAudioPlayer::!CAudioPlayer()
 	if(pGraph) pGraph->Release();
 }
 
-void CAudioPlayer::start(bool repeat, unsigned int interval)
+void CAudioPlayer::start()
 {
-	this->repeat = repeat;
-	this->interval = interval;
+	if(IsPlaying) return;
+	setIsPlaying(true);
+
 	::ResetEvent(hStop);
 
 	try {
@@ -75,6 +79,15 @@ void CAudioPlayer::stop()
 	// Tell worker thread to terminate
 	::SetEvent(hStop);
 	HRESULT_CHECK(pControl->Stop());
+
+	setIsPlaying(false);
+}
+
+void CAudioPlayer::rewind()
+{
+	// Seek to top of stream
+	LONGLONG current = 0;
+	HRESULT_CHECK(pSeeking->SetPositions(&current, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning));
 }
 
 void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
@@ -101,16 +114,7 @@ void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 				switch(eventCode) {
 				case EC_COMPLETE:
 					// Completed to play back
-					if(repeat) {
-						if(interval) {
-							wait = ::WaitForSingleObject(hStop, interval);
-							if(wait == WAIT_OBJECT_0) break;
-						}
-						// Seek to top of stream
-						LONGLONG current = 0;
-						HRESULT_CHECK(pSeeking->SetPositions(&current, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning));
-						exit = false;
-					}
+					dispatcher->BeginInvoke(gcnew Action(this, &CAudioPlayer::onPlayingCompleted));
 					break;
 				default:
 					// Ignore other media event
@@ -123,7 +127,7 @@ void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 			HRESULT_CHECK(pEvent->FreeEventParams(eventCode, lParam1, lParam2));
 			break;
 		default:
-			Console::WriteLine("Unexpected wait result: {0}", wait);
+			Console::WriteLine("Unexpected wait result: {0}, error={1}", wait, ::GetLastError());
 			break;
 		}
 	} while(!exit);
