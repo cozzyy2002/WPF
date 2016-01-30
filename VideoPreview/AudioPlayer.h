@@ -37,6 +37,8 @@ namespace DirectX {
 
 		HANDLE hStop;
 		void handleMediaEvent(System::Object ^sender, System::ComponentModel::DoWorkEventArgs ^e);
+
+		log4net::ILog^ logger;
 	};
 
 }
