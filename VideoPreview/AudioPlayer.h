@@ -18,7 +18,6 @@ namespace DirectX {
 		virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged;
 
 	protected:
-		System::String^ mediaFile;
 		bool isPlaying;
 		void setIsPlaying(bool value) {
 			if(isPlaying != value) {

@@ -10,8 +10,7 @@ using namespace System;
 using namespace System::Windows::Threading;
 
 CAudioPlayer::CAudioPlayer(System::String^ mediaFile)
-	: mediaFile(mediaFile)
-	, dispatcher(Dispatcher::CurrentDispatcher)
+	: dispatcher(Dispatcher::CurrentDispatcher)
 	, pGraph(NULL), pControl(NULL), pSeeking(NULL)
 	, logger(log4net::LogManager::GetLogger(this->GetType()))
 {
