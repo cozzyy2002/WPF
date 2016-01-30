@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -40,6 +41,8 @@ namespace TestApp
             this.DeviceCategories = new List<DirectX.CDevice.CCategory>(DirectX.CDevice.Categories);
             this.selectedCategory = DirectX.CDevice.VideoInputDeviceCategory;
             this.Devices = new ObservableCollection<DirectX.CDevice>();
+
+            this.AudioFileName = @"C:\Windows\Media\ringout.wav";
         }
 
         public List<DirectX.CDevice.CCategory> DeviceCategories { get; protected set; }
@@ -98,6 +101,20 @@ namespace TestApp
         }
         DirectX.CVideoPreview videoPreview = null;
 
+        public static readonly DependencyProperty AudioFileNameProperty = DependencyProperty.Register("AudioFileName", typeof(string), typeof(MainWindow));
+        public string AudioFileName {
+            get { return (string)GetValue(AudioFileNameProperty); }
+            set { SetValue(AudioFileNameProperty, value); }
+        }
+
+        private void onAudioFileSelectButtonClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.FileName = AudioFileName;
+            dlg.Filter = "Audio files|*.wav;*.mid;*.mp3;*.wma|All files|*";
+            if (dlg.ShowDialog(this) == true) { AudioFileName = dlg.FileName; }
+        }
+
         public StartStopCommandImpl StartStopCommand { get; protected set; }
 
         public Properties.Settings Settings { get; protected set; }
@@ -132,10 +149,7 @@ namespace TestApp
 
                 if (audioPlayer == null)
                 {
-                    audioPlayer = new DirectX.CAudioPlayer(
-                        @"C:\Windows\Media\ringout.wav"
-                        //@"C:\cozzy\Music\Al DiMeola\Elegant Gypsy\01 Flight over Rio.wma"
-                        );
+                    audioPlayer = new DirectX.CAudioPlayer(mainWindow.AudioFileName);
                     audioPlayer.PropertyChanged += (object s, PropertyChangedEventArgs e) =>
                     {
                         if (!audioPlayer.IsPlaying)

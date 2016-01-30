@@ -85,7 +85,9 @@
                           IsChecked="{Binding Path=IsCameraActive}"
                           Name="StartStopToggleButton"/>
             <Separator x:Uid="Separator_2" />
-            <Label x:Uid="Label_2">Language</Label>
+            <Button Click="onAudioFileSelectButtonClick">Audio file</Button>
+            <TextBox Text="{Binding Path=AudioFileName}" MinWidth="80" />
+            <!--<Label x:Uid="Label_2">Language</Label>
             <ComboBox x:Uid="ComboBox_1" ItemsSource="{Binding Path=Cultures}"
                       SelectedItem="{Binding Path=Settings.CultureInfo}"
                       MinWidth="80">
@@ -97,7 +99,7 @@
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
-            </ComboBox>
+            </ComboBox>-->
             
             <Button Click="onToolButtonClick">Tool</Button>
         </ToolBar>
