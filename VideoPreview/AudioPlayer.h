@@ -35,6 +35,7 @@ namespace DirectX {
 		IMediaSeeking* pSeeking;
 
 		HANDLE hStop;
+		HANDLE hEndOfStream;
 		void handleMediaEvent(System::Object ^sender, System::ComponentModel::DoWorkEventArgs ^e);
 
 		log4net::ILog^ logger;

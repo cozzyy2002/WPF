@@ -30,6 +30,12 @@ CAudioPlayer::CAudioPlayer(System::String^ mediaFile)
 		HRESULT_CHECK(pGraph.QueryInterface<IMediaControl>(&pControl));
 		CComPtr<IMediaSeeking> pSeeking;
 		HRESULT_CHECK(pGraph.QueryInterface<IMediaSeeking>(&pSeeking));
+		CComPtr<IMediaEventEx> pMediaEvent;
+		HRESULT_CHECK(pGraph.QueryInterface(&pMediaEvent));
+		HRESULT_CHECK(pMediaEvent->SetNotifyFlags(AM_MEDIAEVENT_NONOTIFY));
+		HANDLE h;	// Temporally handle for interior_ptr<HANDLE> hEndOfStream
+		HRESULT_CHECK(pMediaEvent->GetEventHandle((OAEVENT*)&h));
+		hEndOfStream = h;
 
 		// Move COM objects to this member variables
 		this->pGraph = pGraph.Detach();
@@ -114,45 +120,26 @@ void CAudioPlayer::rewind()
 
 void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
 {
-	CComPtr<IMediaEvent> pEvent;
-	HRESULT_CHECK(pGraph->QueryInterface(IID_IMediaEvent, (void**)&pEvent));
-	HANDLE hEvents[] = {hStop, 0};
-	HRESULT_CHECK(pEvent->GetEventHandle((OAEVENT*)&hEvents[1]));
+	HANDLE hEvents[] = {hStop, hEndOfStream};
 
-	bool exit = true;
-	do {
-		// Wait for stop() method called or completed to play back
-		DWORD wait = ::WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, FALSE, INFINITE);
-		switch(wait) {
-		case WAIT_OBJECT_0:
-			// stop() method called
-			break;
-		case WAIT_OBJECT_0 + 1:
-			// Media event occurs
-			long eventCode;
-			LONG_PTR lParam1, lParam2;
-			try {
-				HRESULT_CHECK(pEvent->GetEvent(&eventCode, &lParam1, &lParam2, INFINITE));
-				switch(eventCode) {
-				case EC_COMPLETE:
-					// Completed to play back
-					if(logger->IsDebugEnabled) logger->DebugFormat("handleMediaEvent(): event=EC_COMPLETE");
-
-					dispatcher->BeginInvoke(gcnew Action(this, &CAudioPlayer::onPlayingCompleted));
-					break;
-				default:
-					// Ignore other media event
-					exit = false;
-					break;
-				}
-			} catch(Exception^ ex) {
-				if(logger->IsFatalEnabled) logger->FatalFormat("handleMediaEvent() Exception: {0}", ex->Message);
-			}
-			HRESULT_CHECK(pEvent->FreeEventParams(eventCode, lParam1, lParam2));
-			break;
-		default:
-			if(logger->IsFatalEnabled) logger->FatalFormat("handleMediaEvent() Unexpected wait result: {0}, error={1}", wait, ::GetLastError());
-			break;
+	// Wait for stop() method called or completed to play back
+	DWORD wait = ::WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, FALSE, INFINITE);
+	switch(wait) {
+	case WAIT_OBJECT_0:
+		// stop() method called
+		break;
+	case WAIT_OBJECT_0 + 1:
+		// End of stream
+		try {
+			// Completed to play back
+			if(logger->IsDebugEnabled) logger->DebugFormat("handleMediaEvent(): End of stream");
+			dispatcher->BeginInvoke(gcnew Action(this, &CAudioPlayer::onPlayingCompleted));
+		} catch(Exception^ ex) {
+			if(logger->IsFatalEnabled) logger->FatalFormat("handleMediaEvent() Exception: {0}", ex->Message);
 		}
-	} while(!exit);
+		break;
+	default:
+		if(logger->IsFatalEnabled) logger->FatalFormat("handleMediaEvent() Unexpected wait result: {0}, error={1}", wait, ::GetLastError());
+		break;
+	}
 }
