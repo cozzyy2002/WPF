@@ -80,9 +80,8 @@ void CAudioPlayer::start()
 	::ResetEvent(hStop);
 
 	try {
-		BackgroundWorker^ worker = gcnew BackgroundWorker();
-		worker->DoWork += gcnew DoWorkEventHandler(this, &CAudioPlayer::handleMediaEvent);
-		worker->RunWorkerAsync();
+		handleEventTask = gcnew System::Threading::Tasks::Task(gcnew Action(this, &CAudioPlayer::handleMediaEvent));
+		handleEventTask->Start();
 
 		HRESULT_CHECK(pControl->Run());
 	} catch(Exception^ ex) {
@@ -97,6 +96,7 @@ void CAudioPlayer::stop()
 	try {
 		// Tell worker thread to terminate
 		::SetEvent(hStop);
+		handleEventTask->Wait();
 		HRESULT_CHECK(pControl->Stop());
 
 		setIsPlaying(false);
@@ -118,7 +118,7 @@ void CAudioPlayer::rewind()
 	}
 }
 
-void CAudioPlayer::handleMediaEvent(Object ^sender, DoWorkEventArgs ^e)
+void CAudioPlayer::handleMediaEvent()
 {
 	HANDLE hEvents[] = {hStop, hEndOfStream};
 

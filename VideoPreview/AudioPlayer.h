@@ -29,6 +29,7 @@ namespace DirectX {
 		void onPlayingCompleted() { setIsPlaying(false); }
 
 		System::Windows::Threading::Dispatcher^ dispatcher;
+		System::Threading::Tasks::Task^ handleEventTask;
 
 		IGraphBuilder *pGraph;
 		IMediaControl* pControl;
@@ -36,7 +37,7 @@ namespace DirectX {
 
 		HANDLE hStop;
 		HANDLE hEndOfStream;
-		void handleMediaEvent(System::Object ^sender, System::ComponentModel::DoWorkEventArgs ^e);
+		void handleMediaEvent();
 
 		log4net::ILog^ logger;
 	};

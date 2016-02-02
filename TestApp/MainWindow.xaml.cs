@@ -157,8 +157,11 @@ namespace TestApp
                             BackgroundWorker worker = new BackgroundWorker();
                             worker.DoWork += (object sender, DoWorkEventArgs ev) => {
                                 Thread.Sleep(2000);
-                                audioPlayer.rewind();
-                                audioPlayer.start();
+                                if (audioPlayer != null)
+                                {
+                                    audioPlayer.rewind();
+                                    audioPlayer.start();
+                                }
                             };
                             worker.RunWorkerAsync();
                         }
