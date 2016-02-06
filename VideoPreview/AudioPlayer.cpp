@@ -2,6 +2,7 @@
 #include "AudioPlayer.h"
 #include "Win32.h"
 #include <string.h>
+#include <typeinfo>
 #include <vcclr.h>
 
 using namespace System::ComponentModel;
@@ -9,38 +10,82 @@ using namespace DirectX;
 using namespace System;
 using namespace System::Windows::Threading;
 
+static CAudioPlayer::CAudioPlayer()
+{
+	logger = log4net::LogManager::GetLogger(CAudioPlayer::typeid);
+}
+
+/** Common initialize method called by constructors */
+void CAudioPlayer::init()
+{
+	this->dispatcher = Dispatcher::CurrentDispatcher;
+	this->pGraph = NULL;
+	this->pControl = NULL;
+	this->pSeeking = NULL;
+
+	this->hStop = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	CComPtr<IGraphBuilder> pGraph;
+	HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER));
+
+	// Create IMediaControl object
+	CComPtr<IMediaControl> pControl;
+	HRESULT_CHECK(pGraph.QueryInterface<IMediaControl>(&pControl));
+	CComPtr<IMediaSeeking> pSeeking;
+	HRESULT_CHECK(pGraph.QueryInterface<IMediaSeeking>(&pSeeking));
+	CComPtr<IMediaEventEx> pMediaEvent;
+	HRESULT_CHECK(pGraph.QueryInterface(&pMediaEvent));
+	HRESULT_CHECK(pMediaEvent->SetNotifyFlags(AM_MEDIAEVENT_NONOTIFY));
+	HANDLE h;	// Temporally handle for interior_ptr<HANDLE> hEndOfStream
+	HRESULT_CHECK(pMediaEvent->GetEventHandle((OAEVENT*)&h));
+	this->hEndOfStream = h;
+
+	// Move COM objects to this member variables
+	this->pGraph = pGraph.Detach();
+	this->pControl = pControl.Detach();
+	this->pSeeking = pSeeking.Detach();
+}
+
 CAudioPlayer::CAudioPlayer(System::String^ mediaFile)
-	: dispatcher(Dispatcher::CurrentDispatcher)
-	, pGraph(NULL), pControl(NULL), pSeeking(NULL)
-	, logger(log4net::LogManager::GetLogger(this->GetType()))
 {
 	if(logger->IsDebugEnabled) logger->DebugFormat("CAudioPlayer({0})", mediaFile);
 
-	hStop = CreateEvent(NULL, TRUE, FALSE, NULL);
-
 	try {
-		CComPtr<IGraphBuilder> pGraph;
-		HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER));
+		init();
 
+		// Add source filter that decodes media file to the filter graph.
+		// Default audio renderer will be selected.
 		pin_ptr<const wchar_t> str = PtrToStringChars(mediaFile);
 		HRESULT_CHECK(pGraph->RenderFile(str, NULL));
+	} catch(Exception^ ex) {
+		if(logger->IsErrorEnabled) logger->ErrorFormat("CAudioPlayer() Exception: {0}", ex->Message);
+	}
+}
 
-		// Create IMediaControl object
-		CComPtr<IMediaControl> pControl;
-		HRESULT_CHECK(pGraph.QueryInterface<IMediaControl>(&pControl));
-		CComPtr<IMediaSeeking> pSeeking;
-		HRESULT_CHECK(pGraph.QueryInterface<IMediaSeeking>(&pSeeking));
-		CComPtr<IMediaEventEx> pMediaEvent;
-		HRESULT_CHECK(pGraph.QueryInterface(&pMediaEvent));
-		HRESULT_CHECK(pMediaEvent->SetNotifyFlags(AM_MEDIAEVENT_NONOTIFY));
-		HANDLE h;	// Temporally handle for interior_ptr<HANDLE> hEndOfStream
-		HRESULT_CHECK(pMediaEvent->GetEventHandle((OAEVENT*)&h));
-		hEndOfStream = h;
+CAudioPlayer::CAudioPlayer(System::String^ mediaFile, CDevice^ speaker)
+{
+	if(logger->IsDebugEnabled) logger->DebugFormat("CAudioPlayer({0},{1})", mediaFile, speaker->FriendlyName);
 
-		// Move COM objects to this member variables
-		this->pGraph = pGraph.Detach();
-		this->pControl = pControl.Detach();
-		this->pSeeking = pSeeking.Detach();
+	try {
+		init();
+
+		// Add source filter that decodes media file to the filter graph
+		// and get output pin of the filter as pSource
+		pin_ptr<const wchar_t> str = PtrToStringChars(mediaFile);
+		CComPtr<IBaseFilter> pSource;
+		HRESULT_CHECK(pGraph->AddSourceFilter(str, NULL, &pSource));
+
+		// Add speaker to the filter graph
+		// and get input pin of the speaker as pSpeaker
+		CComPtr<IBaseFilter> pSpeaker(speaker->getFilter());
+		CComPtr<IFilterGraph> pFilter;
+		HRESULT_CHECK(pGraph->QueryInterface(&pFilter));
+		HRESULT_CHECK(pFilter->AddFilter(pSpeaker, NULL));
+
+		// Connect putput pin of pSource to input pin of pSpeaker
+		CComPtr<IPin> pSourcePin(CDevice::getPin(pSource, PINDIR_OUTPUT));
+		CComPtr<IPin> pOutPin(CDevice::getPin(pSpeaker, PINDIR_INPUT));
+		HRESULT_CHECK(pGraph->Connect(pSourcePin, pOutPin));
 	} catch(Exception^ ex) {
 		if(logger->IsErrorEnabled) logger->ErrorFormat("CAudioPlayer() Exception: {0}", ex->Message);
 	}

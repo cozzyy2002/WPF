@@ -1,10 +1,14 @@
 #pragma once
 
+#include "Device.h"
+
 namespace DirectX {
 
 	public ref class CAudioPlayer : public System::ComponentModel::INotifyPropertyChanged {
 	public:
+		static CAudioPlayer();
 		CAudioPlayer(System::String^ mediaFile);
+		CAudioPlayer(System::String^ mediaFile, CDevice^ speaker);
 		~CAudioPlayer();
 		!CAudioPlayer();
 
@@ -18,6 +22,8 @@ namespace DirectX {
 		virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged;
 
 	protected:
+		void init();
+
 		bool isPlaying;
 		void setIsPlaying(bool value) {
 			if(isPlaying != value) {
@@ -39,7 +45,7 @@ namespace DirectX {
 		HANDLE hEndOfStream;
 		void handleMediaEvent();
 
-		log4net::ILog^ logger;
+		static log4net::ILog^ logger;
 	};
 
 }

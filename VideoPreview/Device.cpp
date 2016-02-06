@@ -62,14 +62,39 @@ CDevice::CDevice(IMoniker* pMoniker, CCategory^ category)
 
 String^ CDevice::getStringProperty(IPropertyBag* pb, LPCWSTR name)
 {
-	CComVariant var;
-	HRESULT hr = pb->Read(name, &var, NULL);
-	if(SUCCEEDED(hr))
-	{
+	try {
+		CComVariant var;
+		HRESULT_CHECK(pb->Read(name, &var, NULL));
 		return gcnew String(var.bstrVal);
-	} else {
-		Console::WriteLine("IPropertyBag::Read('{0}') of '{1}' failed. error=0x{2,8:x}",
-							gcnew String(name), m_category->Name, hr);
-		return nullptr;
+	} catch(Exception^ ex) {
+		Console::WriteLine("{0}: {1}", ex->GetType(), ex->Message);
+		return String::Format("<Unknown {0}>", gcnew String(name));
 	}
+}
+
+IBaseFilter* CDevice::getFilter()
+{
+	CComPtr<IBaseFilter> pDevice;
+	HRESULT_CHECK(getMoniker()->BindToObject(0, 0, IID_IBaseFilter, (void**)&pDevice));
+	return pDevice.Detach();
+}
+
+IPin* CDevice::getPin(PIN_DIRECTION dir)
+{
+	return getPin(getFilter(), dir);
+}
+
+/*static*/ IPin* CDevice::getPin(IBaseFilter* pFilter, PIN_DIRECTION dir)
+{
+	CComPtr<IEnumPins> pEnumPins;
+	HRESULT_CHECK(pFilter->EnumPins(&pEnumPins));
+	CComPtr<IPin> pPin;
+	while(S_OK == pEnumPins->Next(1, &pPin, NULL)) {
+		PIN_DIRECTION pinDir;
+		HRESULT_CHECK(pPin->QueryDirection(&pinDir));
+		if(pinDir == dir) {
+			return pPin.Detach();
+		}
+	}
+	throw gcnew System::Exception("getPin(): No such pin");
 }

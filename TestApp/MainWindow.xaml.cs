@@ -69,6 +69,8 @@ namespace TestApp
             get { return cameraDevice; }
             set
             {
+                cameraDevice = value;
+
                 if (VideoPreview != null)
                 {
                     VideoPreview.Dispose();
@@ -79,7 +81,6 @@ namespace TestApp
                     Console.WriteLine("Camera device: {0}", value.FriendlyName);
                     if (value.Is(DirectX.CDevice.VideoInputDeviceCategory))
                     {
-                        cameraDevice = value;
                         VideoPreview = new DirectX.CVideoPreview();
                         VideoPreview.setup(CameraDevice, VideoArea);
                     }
@@ -137,7 +138,7 @@ namespace TestApp
 
             public bool CanExecute(object parameter)
             {
-                return (mainWindow.VideoPreview != null);
+                return true;// (mainWindow.VideoPreview != null);
             }
 
             public event EventHandler CanExecuteChanged;
@@ -149,7 +150,16 @@ namespace TestApp
 
                 if (audioPlayer == null)
                 {
-                    audioPlayer = new DirectX.CAudioPlayer(mainWindow.AudioFileName);
+                    if (mainWindow.cameraDevice.Is(DirectX.CDevice.AudioRendererCategory))
+                    {
+                        // Play audio file output to the device specified by CameraDevice
+                        audioPlayer = new DirectX.CAudioPlayer(mainWindow.AudioFileName, mainWindow.CameraDevice);
+                    }
+                    else
+                    {
+                        // Play audio file output to the default audio renderer device
+                        audioPlayer = new DirectX.CAudioPlayer(mainWindow.AudioFileName);
+                    }
                     audioPlayer.PropertyChanged += (object s, PropertyChangedEventArgs e) =>
                     {
                         if (!audioPlayer.IsPlaying)

@@ -43,6 +43,9 @@ namespace DirectX {
 		property String^ DevicePath{ String^ get() { return m_devicePath; } }
 		bool Is(CCategory^ category) { return this->Category->getClsId() == category->getClsId(); }
 		IMoniker* getMoniker() { return m_pMoniker; }
+		IBaseFilter* getFilter();
+		IPin* getPin(PIN_DIRECTION dir);
+		static IPin* getPin(IBaseFilter* pFilter, PIN_DIRECTION dir);
 
 		String^ ToString() override { return FriendlyName; }
 
