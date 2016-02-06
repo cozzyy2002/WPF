@@ -77,13 +77,12 @@ void CVideoPreview::setup(CDevice^ camera, IntPtr hwnd, double width, double hei
 		// Initialize Filter Graph Manager and Capture Graph Manager
 		CComPtr<IGraphBuilder> pGraph;
 		CComPtr<ICaptureGraphBuilder2> pBuild;
-		HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER));
-		HRESULT_CHECK(pBuild.CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC_SERVER));
+		HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph));
+		HRESULT_CHECK(pBuild.CoCreateInstance(CLSID_CaptureGraphBuilder2));
 		HRESULT_CHECK(pBuild->SetFiltergraph(pGraph));
 
 		// Create capture filter for the camera device
-		CComPtr<IBaseFilter> pCap;
-		HRESULT_CHECK(camera->getMoniker()->BindToObject(0, 0, IID_IBaseFilter, (void**)&pCap));
+		CComPtr<IBaseFilter> pCap(camera->getFilter());
 
 		// Connect filters in the Filter Graph
 		HRESULT_CHECK(pGraph->AddFilter(pCap, NULL));
@@ -91,14 +90,14 @@ void CVideoPreview::setup(CDevice^ camera, IntPtr hwnd, double width, double hei
 
 		// Setup video window
 		CComPtr<IVideoWindow> pVideoWindow;
-		HRESULT_CHECK(pGraph.QueryInterface<IVideoWindow>(&pVideoWindow));
+		HRESULT_CHECK(pGraph.QueryInterface(&pVideoWindow));
 		HRESULT_CHECK(pVideoWindow->put_Owner((OAHWND)(HANDLE)hwnd));
 		HRESULT_CHECK(pVideoWindow->put_WindowStyle(WS_CHILD | WS_CLIPSIBLINGS));
 		HRESULT_CHECK(pVideoWindow->SetWindowPosition(0, 0, (long)width, (long)height));
 
 		// Create IMediaControl object
 		CComPtr<IMediaControl> pControl;
-		HRESULT_CHECK(pGraph.QueryInterface<IMediaControl>(&pControl));
+		HRESULT_CHECK(pGraph.QueryInterface(&pControl));
 
 		// Move COM objects to this member variables
 		this->pGraph = pGraph.Detach();
