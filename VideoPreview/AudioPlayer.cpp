@@ -76,15 +76,13 @@ CAudioPlayer::CAudioPlayer(System::String^ mediaFile, CDevice^ speaker)
 		HRESULT_CHECK(pGraph->AddSourceFilter(str, NULL, &pSource));
 
 		// Add speaker to the filter graph
-		// and get input pin of the speaker as pSpeaker
-		CComPtr<IBaseFilter> pSpeaker(speaker->getFilter());
-		CComPtr<IFilterGraph> pFilter;
-		HRESULT_CHECK(pGraph->QueryInterface(&pFilter));
-		HRESULT_CHECK(pFilter->AddFilter(pSpeaker, NULL));
+		CComPtr<IFilterGraph> pFilterGraph;
+		HRESULT_CHECK(pGraph->QueryInterface(&pFilterGraph));
+		HRESULT_CHECK(pFilterGraph->AddFilter(speaker->getFilter(), NULL));
 
-		// Connect putput pin of pSource to input pin of pSpeaker
+		// Connect output pin of pSource to input pin of pSpeaker
 		CComPtr<IPin> pSourcePin(CDevice::getPin(pSource, PINDIR_OUTPUT));
-		CComPtr<IPin> pOutPin(CDevice::getPin(pSpeaker, PINDIR_INPUT));
+		CComPtr<IPin> pOutPin(speaker->getPin());
 		HRESULT_CHECK(pGraph->Connect(pSourcePin, pOutPin));
 	} catch(Exception^ ex) {
 		if(logger->IsErrorEnabled) logger->ErrorFormat("CAudioPlayer() Exception: {0}", ex->Message);

@@ -8,17 +8,17 @@ using namespace System::Collections::Generic;
 
 /*static property*/ CDevice::CCategory^ CDevice::VideoInputDeviceCategory::get()
 {
-	return gcnew CCategory(&CLSID_VideoInputDeviceCategory, _T("Video Capture Sources"));
+	return gcnew CCategory(&CLSID_VideoInputDeviceCategory, _T("Video Capture Sources"), PINDIR_OUTPUT);
 }
 
 /*static property*/ CDevice::CCategory^ CDevice::AudioInputDeviceCategory::get()
 {
-	return gcnew CCategory(&CLSID_AudioInputDeviceCategory, _T("Audio Capture Sources"));
+	return gcnew CCategory(&CLSID_AudioInputDeviceCategory, _T("Audio Capture Sources"), PINDIR_OUTPUT);
 }
 
 /*static property*/ CDevice::CCategory^ CDevice::AudioRendererCategory::get()
 {
-	return gcnew CCategory(&CLSID_AudioRendererCategory, _T("Audio Renderers"));
+	return gcnew CCategory(&CLSID_AudioRendererCategory, _T("Audio Renderers"), PINDIR_INPUT);
 }
 
 /*static property*/ ICollection<CDevice::CCategory^>^ CDevice::Categories::get()
@@ -38,7 +38,7 @@ using namespace System::Collections::Generic;
 	HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER));
 	CComPtr<IEnumMoniker> pEnum;
 	if(S_OK != HRESULT_CHECK(pDevEnum->CreateClassEnumerator(category->getClsId(), &pEnum, 0))) {
-		Console::WriteLine("Device is not found: {0}", category->Name);
+		if(logger->IsErrorEnabled) logger->ErrorFormat("Device is not found: {0}", category->Name);
 		return list;
 	}
 	CComPtr<IMoniker> pMoniker;
@@ -49,8 +49,13 @@ using namespace System::Collections::Generic;
 	return list;
 }
 
+static CDevice::CDevice()
+{
+	logger = log4net::LogManager::GetLogger(CDevice::typeid);
+}
+
 CDevice::CDevice(IMoniker* pMoniker, CCategory^ category)
-	: m_pMoniker(pMoniker), m_category(category)
+	: m_pMoniker(pMoniker), m_pBaseFilter(NULL), m_category(category)
 {
 	CComPtr<IPropertyBag> pb;
 	HRESULT_CHECK(pMoniker->BindToStorage(NULL, NULL, IID_PPV_ARGS(&pb)));
@@ -60,28 +65,38 @@ CDevice::CDevice(IMoniker* pMoniker, CCategory^ category)
 	m_devicePath = getStringProperty(pb, L"DevicePath");
 }
 
+CDevice::~CDevice()
+{
+	this->!CDevice();
+}
+
+CDevice::!CDevice()
+{
+	if(this->m_pMoniker) this->m_pMoniker->Release();
+	if(this->m_pBaseFilter) this->m_pBaseFilter->Release();
+}
+
 String^ CDevice::getStringProperty(IPropertyBag* pb, LPCWSTR name)
 {
-	try {
-		CComVariant var;
-		HRESULT_CHECK(pb->Read(name, &var, NULL));
-		return gcnew String(var.bstrVal);
-	} catch(Exception^ ex) {
-		Console::WriteLine("{0}: {1}", ex->GetType(), ex->Message);
-		return String::Format("<Unknown {0}>", gcnew String(name));
-	}
+	CComVariant var;
+	return SUCCEEDED(pb->Read(name, &var, NULL)) ?
+		gcnew String(var.bstrVal) :
+		String::Format("<Unknown {0}>", gcnew String(name));
 }
 
 IBaseFilter* CDevice::getFilter()
 {
-	CComPtr<IBaseFilter> pDevice;
-	HRESULT_CHECK(getMoniker()->BindToObject(0, 0, IID_IBaseFilter, (void**)&pDevice));
-	return pDevice.Detach();
+	if(!m_pBaseFilter) {
+		CComPtr<IBaseFilter> pFilter;
+		HRESULT_CHECK(getMoniker()->BindToObject(0, 0, IID_IBaseFilter, (void**)&pFilter));
+		m_pBaseFilter = pFilter.Detach();
+	}
+	return m_pBaseFilter;
 }
 
-IPin* CDevice::getPin(PIN_DIRECTION dir)
+IPin* CDevice::getPin()
 {
-	return getPin(getFilter(), dir);
+	return getPin(getFilter(), Category->getPinDirection());
 }
 
 /*static*/ IPin* CDevice::getPin(IBaseFilter* pFilter, PIN_DIRECTION dir)
