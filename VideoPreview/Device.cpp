@@ -37,14 +37,14 @@ using namespace System::Collections::Generic;
 	CComPtr<ICreateDevEnum> pDevEnum;
 	HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER));
 	CComPtr<IEnumMoniker> pEnum;
-	if(S_OK != HRESULT_CHECK(pDevEnum->CreateClassEnumerator(category->getClsId(), &pEnum, 0))) {
+	if(S_OK == HRESULT_CHECK(pDevEnum->CreateClassEnumerator(category->getClsId(), &pEnum, 0))) {
+		CComPtr<IMoniker> pMoniker;
+		while(SUCCEEDED(HRESULT_CHECK(pEnum->Next(1, &pMoniker, NULL))) && pMoniker)
+		{
+			list->Add(gcnew CDevice(pMoniker.Detach(), category));
+		}
+	} else {
 		if(logger->IsErrorEnabled) logger->ErrorFormat("Device is not found: {0}", category->Name);
-		return list;
-	}
-	CComPtr<IMoniker> pMoniker;
-	while(SUCCEEDED(HRESULT_CHECK(pEnum->Next(1, &pMoniker, NULL))) && pMoniker)
-	{
-		list->Add(gcnew CDevice(pMoniker.Detach(), category));
 	}
 	return list;
 }
@@ -84,6 +84,9 @@ String^ CDevice::getStringProperty(IPropertyBag* pb, LPCWSTR name)
 		String::Format("<Unknown {0}>", gcnew String(name));
 }
 
+/**
+ * Returns IBaseFilter object bound to IMoniker
+ */
 IBaseFilter* CDevice::getFilter()
 {
 	if(!m_pBaseFilter) {

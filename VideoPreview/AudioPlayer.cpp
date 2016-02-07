@@ -70,7 +70,6 @@ CAudioPlayer::CAudioPlayer(System::String^ mediaFile, CDevice^ speaker)
 		init();
 
 		// Add source filter that decodes media file to the filter graph
-		// and get output pin of the filter as pSource
 		pin_ptr<const wchar_t> str = PtrToStringChars(mediaFile);
 		CComPtr<IBaseFilter> pSource;
 		HRESULT_CHECK(pGraph->AddSourceFilter(str, NULL, &pSource));
