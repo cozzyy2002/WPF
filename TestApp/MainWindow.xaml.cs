@@ -15,6 +15,8 @@ namespace TestApp
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(typeof(MainWindow));
+
         public MainWindow()
         {
             InitializeComponent();
@@ -28,7 +30,7 @@ namespace TestApp
                 switch (e.PropertyName) {
                     case "CultureInfo":
                         CultureInfo value = Settings.CultureInfo;
-                        Console.WriteLine("Current culture={0}", value.EnglishName);
+                        if (logger.IsDebugEnabled) logger.DebugFormat("Current culture={0}", value.EnglishName);
                         break;
                 }
             };
@@ -38,7 +40,12 @@ namespace TestApp
                 this.Cultures.Add(new CultureInfo(s));
             }
 
-            this.DeviceCategories = new List<DirectX.CDevice.CCategory>(DirectX.CDevice.Categories);
+            this.DeviceCategories = new List<DirectX.CDevice.CCategory>(/*DirectX.CDevice.Categories*/)
+            {
+                                                            // Supported device categories are:
+                DirectX.CDevice.VideoInputDeviceCategory,   // CVideoPreview
+                DirectX.CDevice.AudioRendererCategory,      // CAudioPlayer
+            };
             this.selectedCategory = DirectX.CDevice.VideoInputDeviceCategory;
             this.Devices = new ObservableCollection<DirectX.CDevice>();
 
@@ -55,7 +62,7 @@ namespace TestApp
                 selectedCategory = value;
                 foreach (DirectX.CDevice dev in DirectX.CDevice.getDevices(value))
                 {
-                    Console.WriteLine("  " + dev.FriendlyName);
+                    if (logger.IsDebugEnabled) logger.DebugFormat("  " + dev.FriendlyName);
                     Devices.Add(dev);
                 }
                 CameraDevice = (0 < Devices.Count) ? Devices[0] : null;
@@ -78,7 +85,7 @@ namespace TestApp
                 }
                 if (value != null)
                 {
-                    Console.WriteLine("Camera device: {0}", value.FriendlyName);
+                    if (logger.IsDebugEnabled) logger.DebugFormat("Camera device: {0}", value.FriendlyName);
                     if (value.Is(DirectX.CDevice.VideoInputDeviceCategory))
                     {
                         VideoPreview = new DirectX.CVideoPreview();

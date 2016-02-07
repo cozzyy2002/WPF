@@ -12,6 +12,11 @@ using namespace System::Windows;
 using namespace System::Windows::Controls;
 using namespace System::Windows::Threading;
 
+static CVideoPreview::CVideoPreview(void)
+{
+	logger = log4net::LogManager::GetLogger(CVideoPreview::typeid);
+}
+
 CVideoPreview::CVideoPreview(void) : isStarted(false)
 {
 	pGraph = NULL;
@@ -54,14 +59,14 @@ void CVideoPreview::setup(CDevice^ camera, Decorator^ parent)
 	IntPtr hwnd = hWndHost->Handle;
 	double width = parent->ActualWidth;
 	double height = parent->ActualHeight;
-	Console::WriteLine("Video window: hwnd=0x{0:x},size=({1},{2})", hwnd, width, height);
+	if(logger->IsDebugEnabled) logger->DebugFormat("Video window: hwnd=0x{0:x},size=({1},{2})", hwnd, width, height);
 
 	setupResult = Dispatcher::CurrentDispatcher->BeginInvoke(
 		DispatcherPriority::SystemIdle,
 		gcnew Action<CDevice^, IntPtr, double, double>(this, &CVideoPreview::setup),
 		camera, hwnd, width, height);
 
-	Console::WriteLine("Video window is created.");
+	if(logger->IsDebugEnabled) logger->DebugFormat("Video window is created.");
 }
 
 /**
@@ -103,10 +108,10 @@ void CVideoPreview::setup(CDevice^ camera, IntPtr hwnd, double width, double hei
 		this->pGraph = pGraph.Detach();
 		this->pVideoWindow = pVideoWindow.Detach();
 		this->pControl = pControl.Detach();
-		Console::WriteLine("Setup DirectShow is completed.");
+		if(logger->IsDebugEnabled) logger->DebugFormat("Setup DirectShow is completed.");
 
 	} catch(Exception^ ex) {
-		Console::WriteLine("Exception: ", ex->Message);
+		if(logger->IsErrorEnabled) logger->ErrorFormat("Exception: ", ex->Message);
 	}
 }
 
@@ -142,23 +147,23 @@ void CVideoPreview::stop()
 bool CVideoPreview::setupResultCheck()
 {
 	if(setupResult == nullptr) {
-		Console::WriteLine("setup() is not called.");
+		if(logger->IsErrorEnabled) logger->ErrorFormat("setup() is not called.");
 		return false;
 	}
 
 	try {
 		DispatcherOperationStatus st = setupResult->Wait(TimeSpan(0, 0, 5));
 		if(st != DispatcherOperationStatus::Completed) {
-			Console::WriteLine("Failed to wait for setup to complete: {0}", st);
+			if(logger->IsErrorEnabled) logger->ErrorFormat("Failed to wait for setup to complete: {0}", st);
 			return false;
 		}
 	} catch(Exception^ ex) {
-		Console::WriteLine("{0}: {1}", ex->GetType(), ex->Message);
+		if(logger->IsErrorEnabled) logger->ErrorFormat("{0}: {1}", ex->GetType(), ex->Message);
 		return false;
 	}
 
 	if(!pVideoWindow || !pControl) {
-		Console::WriteLine("COM object(s) is not properly created.");
+		if(logger->IsErrorEnabled) logger->ErrorFormat("COM object(s) is not properly created.");
 		return false;
 	}
 	return true;

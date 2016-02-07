@@ -20,6 +20,8 @@ namespace TestApp
     /// </summary>
     public partial class ToolWindow : Window
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(typeof(ToolWindow));
+
         public ToolWindow()
         {
             InitializeComponent();
@@ -52,7 +54,7 @@ namespace TestApp
                 set
                 {
                     if ((inner == null) || (inner.Name != value)) {
-                        Console.WriteLine("CultureInfo: Changing Name: '{0}' -> '{1}'", Name, value);
+                        if (logger.IsDebugEnabled) logger.DebugFormat("CultureInfo: Changing Name: '{0}' -> '{1}'", Name, value);
                         inner = new System.Globalization.CultureInfo(value);
                         onPropertyChanged();
                     }
@@ -66,7 +68,7 @@ namespace TestApp
                 {
                     if ((inner == null) || (inner.LCID != value))
                     {
-                        Console.WriteLine("CultureInfo: Changing LCID: '{0}' -> '{1}'", LCID, value);
+                        if (logger.IsDebugEnabled) logger.DebugFormat("CultureInfo: Changing LCID: '{0}' -> '{1}'", LCID, value);
                         inner = new System.Globalization.CultureInfo(value);
                         onPropertyChanged();
                     }

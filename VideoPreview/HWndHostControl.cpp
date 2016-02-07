@@ -6,6 +6,11 @@ using namespace System::Runtime::InteropServices;
 using namespace System::Windows::Controls;
 using namespace Win32;
 
+static CHWndHostControl::CHWndHostControl()
+{
+	logger = log4net::LogManager::GetLogger(CHWndHostControl::typeid);
+}
+
 CHWndHostControl::CHWndHostControl()
 {
 }
@@ -25,7 +30,9 @@ HandleRef CHWndHostControl::BuildWindowCore(HandleRef hwndParent)
 					0, _T("Static"), _T(""), WS_CHILD | WS_VISIBLE, 0, 0,
 					(int)this->Width, (int)this->Height,
 					(HWND)hwndParent.Handle.ToPointer(), NULL, NULL, NULL);
-	if(!hwnd) Console::WriteLine("CreateWindowEx() failed. error=0x{0:x}", GetLastError());
+	if(!hwnd) {
+		if(logger->IsErrorEnabled) logger->ErrorFormat("CreateWindowEx() failed. error=0x{0:x}", GetLastError());
+	}
 	return HandleRef(this, IntPtr(hwnd));
 }
 

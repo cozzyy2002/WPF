@@ -13,6 +13,7 @@ namespace DirectX {
 		: public System::ComponentModel::INotifyPropertyChanged
 	{
 	public:
+		static CVideoPreview(void);
 		CVideoPreview(void);
 		~CVideoPreview();
 		!CVideoPreview();
@@ -46,9 +47,11 @@ namespace DirectX {
 		void setup(CDevice^ camera, IntPtr hwnd, double width, double height);
 		void onPropertyChanged(System::String^ name, System::Object^ value)
 		{
-			Console::WriteLine("Property '{0}' is changed: {1}", name, value);
+			if(logger->IsDebugEnabled) logger->DebugFormat("Property '{0}' is changed: {1}", name, value);
 			PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(name));
 		}
 		bool setupResultCheck();
+
+		static log4net::ILog^ logger;
 	};
 }

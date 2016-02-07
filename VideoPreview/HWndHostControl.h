@@ -5,6 +5,7 @@ namespace Win32 {
 	public ref class CHWndHostControl :
 		public System::Windows::Interop::HwndHost {
 	public:
+		static CHWndHostControl();
 		CHWndHostControl();
 		void attach(System::Windows::Controls::Decorator^ parent);
 
@@ -20,5 +21,7 @@ namespace Win32 {
 		) override;
 
 		System::Windows::Controls::Decorator^ parent;
+
+		static log4net::ILog^ logger;
 	};
 }
