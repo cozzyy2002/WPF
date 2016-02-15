@@ -35,7 +35,7 @@ using namespace System::Collections::Generic;
 	List<CDevice^>^ list = gcnew List<CDevice^>();
 
 	CComPtr<ICreateDevEnum> pDevEnum;
-	HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER));
+	HRESULT_CHECK(pDevEnum.CoCreateInstance(CLSID_SystemDeviceEnum));
 	CComPtr<IEnumMoniker> pEnum;
 	if(S_OK == HRESULT_CHECK(pDevEnum->CreateClassEnumerator(category->getClsId(), &pEnum, 0))) {
 		CComPtr<IMoniker> pMoniker;
@@ -79,6 +79,7 @@ CDevice::!CDevice()
 String^ CDevice::getStringProperty(IPropertyBag* pb, LPCWSTR name)
 {
 	CComVariant var;
+	HRESULT_CHECK(var.ChangeType(VT_BSTR));
 	return SUCCEEDED(pb->Read(name, &var, NULL)) ?
 		gcnew String(var.bstrVal) :
 		String::Format("<Unknown {0}>", gcnew String(name));
@@ -113,6 +114,7 @@ IPin* CDevice::getPin()
 		if(pinDir == dir) {
 			return pPin.Detach();
 		}
+		pPin.Release();
 	}
 	throw gcnew System::Exception("getPin(): No such pin");
 }
