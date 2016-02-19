@@ -48,6 +48,7 @@ namespace DirectX {
 		bool Is(CCategory^ category) { return this->Category->getClsId() == category->getClsId(); }
 		IMoniker* getMoniker() { return m_pMoniker; }
 		IBaseFilter* getFilter();
+		void releaseFilter();
 		IPin* getPin();
 		static IPin* getPin(IBaseFilter* pFilter, PIN_DIRECTION dir);
 

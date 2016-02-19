@@ -77,6 +77,7 @@ CAudioPlayer::CAudioPlayer(System::String^ mediaFile, CDevice^ speaker)
 		// Add speaker to the filter graph
 		CComPtr<IFilterGraph> pFilterGraph;
 		HRESULT_CHECK(pGraph->QueryInterface(&pFilterGraph));
+		speaker->releaseFilter();
 		HRESULT_CHECK(pFilterGraph->AddFilter(speaker->getFilter(), NULL));
 
 		// Connect output pin of pSource to input pin of pSpeaker

@@ -98,6 +98,14 @@ IBaseFilter* CDevice::getFilter()
 	return m_pBaseFilter;
 }
 
+void CDevice::releaseFilter()
+{
+	if(m_pBaseFilter) {
+		m_pBaseFilter->Release();
+		m_pBaseFilter = NULL;
+	}
+}
+
 IPin* CDevice::getPin()
 {
 	return getPin(getFilter(), Category->getPinDirection());

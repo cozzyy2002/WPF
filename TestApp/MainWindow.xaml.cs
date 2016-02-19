@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace TestApp
 {
@@ -167,20 +168,23 @@ namespace TestApp
                         // Play audio file output to the default audio renderer device
                         audioPlayer = new DirectX.CAudioPlayer(mainWindow.AudioFileName);
                     }
+
                     audioPlayer.PropertyChanged += (object s, PropertyChangedEventArgs e) =>
                     {
                         if (!audioPlayer.IsPlaying)
                         {
-                            BackgroundWorker worker = new BackgroundWorker();
-                            worker.DoWork += (object sender, DoWorkEventArgs ev) => {
-                                Thread.Sleep(2000);
-                                if (audioPlayer != null)
+                            DispatcherTimer timer = new DispatcherTimer();
+                            timer.Interval = new TimeSpan(0,0,2);
+                            timer.Tick += new EventHandler((object o, EventArgs ev) =>
                                 {
-                                    audioPlayer.rewind();
-                                    audioPlayer.start();
-                                }
-                            };
-                            worker.RunWorkerAsync();
+                                    timer.Stop();
+                                    if (audioPlayer != null)
+                                    {
+                                        audioPlayer.rewind();
+                                        audioPlayer.start();
+                                    }
+                                });
+                            timer.Start();
                         }
                     };
                     audioPlayer.start();
