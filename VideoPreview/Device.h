@@ -46,13 +46,15 @@ namespace DirectX {
 		property String^ Description{ String^ get() { return m_description; } }
 		property String^ DevicePath{ String^ get() { return m_devicePath; } }
 		bool Is(CCategory^ category) { return this->Category->getClsId() == category->getClsId(); }
+
+		String^ ToString() override { return FriendlyName; }
+
+	internal:
 		IMoniker* getMoniker() { return m_pMoniker; }
 		IBaseFilter* getFilter();
 		void releaseFilter();
 		IPin* getPin();
 		static IPin* getPin(IBaseFilter* pFilter, PIN_DIRECTION dir);
-
-		String^ ToString() override { return FriendlyName; }
 
 	protected:
 		IMoniker* m_pMoniker;
