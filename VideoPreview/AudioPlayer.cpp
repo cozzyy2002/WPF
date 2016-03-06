@@ -26,7 +26,7 @@ void CAudioPlayer::init()
 	this->hStop = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	CComPtr<IGraphBuilder> pGraph;
-	HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER));
+	HRESULT_CHECK(pGraph.CoCreateInstance(CLSID_FilterGraph));
 
 	// Create IMediaControl object
 	CComPtr<IMediaControl> pControl;
@@ -42,6 +42,7 @@ void CAudioPlayer::init()
 
 	// Move COM objects to this member variables
 	this->pGraph = pGraph.Detach();
+	AddToROT(this->pGraph);
 	this->pControl = pControl.Detach();
 	this->pSeeking = pSeeking.Detach();
 }
@@ -73,6 +74,12 @@ CAudioPlayer::CAudioPlayer(System::String^ mediaFile, CDevice^ speaker)
 		pin_ptr<const wchar_t> str = PtrToStringChars(mediaFile);
 		CComPtr<IBaseFilter> pSource;
 		HRESULT_CHECK(pGraph->AddSourceFilter(str, NULL, &pSource));
+
+		//CComPtr<IAMMediaContent> pContent;
+		//CComBSTR title;
+		//HRESULT_CHECK(pSource->QueryInterface(IID_IAMMediaContent, (void**)&pContent));
+		//HRESULT_CHECK(pContent->get_Title(&title));
+		//logger->InfoFormat("Title='{0}'", gcnew String(title));
 
 		// Add speaker to the filter graph
 		CComPtr<IFilterGraph> pFilterGraph;
@@ -107,7 +114,10 @@ CAudioPlayer::!CAudioPlayer()
 		}
 
 		if(pSeeking) pSeeking->Release();
-		if(pGraph) pGraph->Release();
+		if(pGraph) {
+			RemoveFromROT();
+			pGraph->Release();
+		}
 	} catch(Exception^ ex) {
 		if(logger->IsErrorEnabled) logger->ErrorFormat("!CAudioPlayer() Exception: {0}", ex->Message);
 	}
@@ -184,5 +194,70 @@ void CAudioPlayer::handleMediaEvent()
 	default:
 		if(logger->IsFatalEnabled) logger->FatalFormat("handleMediaEvent() Unexpected wait result: {0}, error={1}", wait, ::GetLastError());
 		break;
+	}
+}
+
+// Loading a Graph From an External Process
+// https://msdn.microsoft.com/en-us/library/dd390650%28v=vs.85%29.aspx
+
+static CRunningObjectHandler::CRunningObjectHandler()
+{
+	logger = log4net::LogManager::GetLogger(CRunningObjectHandler::typeid);
+}
+
+CRunningObjectHandler::CRunningObjectHandler()
+{
+	CComPtr<IRunningObjectTable> pROT;
+	HRESULT_CHECK(GetRunningObjectTable(0, &pROT));
+	this->pROT = pROT.Detach();
+}
+
+CRunningObjectHandler::~CRunningObjectHandler()
+{
+	this->!CRunningObjectHandler();
+}
+
+CRunningObjectHandler::!CRunningObjectHandler()
+{
+	this->pROT->Release();
+}
+
+void CRunningObjectHandler::AddToROT(IUnknown* pUnkGraph)
+{
+	WCHAR wsz[80];
+	swprintf_s(wsz, L"FilterGraph %08x pid %08x", (DWORD_PTR)pUnkGraph, GetCurrentProcessId());
+	CComPtr<IMoniker> pMoniker;
+	HRESULT_CHECK(CreateItemMoniker(L"!", wsz, &pMoniker));
+	DWORD dwRegister;
+	HRESULT_CHECK(pROT->Register(ROTFLAGS_REGISTRATIONKEEPSALIVE, pUnkGraph, pMoniker, &dwRegister));
+	this->dwRegister = dwRegister;
+	logger->DebugFormat("Registered ROT: '{0}', {1}", gcnew String(wsz), dwRegister);
+	PrintROT("AddToROT");
+}
+
+void CRunningObjectHandler::RemoveFromROT()
+{
+	PrintROT("RemoveFromROT");
+	HRESULT_CHECK(pROT->Revoke(dwRegister));
+}
+
+void CRunningObjectHandler::PrintROT(String^ title)
+{
+	logger->Info(title);
+
+	CComPtr<IEnumMoniker> pEnum;
+	HRESULT_CHECK(pROT->EnumRunning(&pEnum));
+	CComPtr<IMoniker> pMoniker;
+	while(HRESULT_CHECK(pEnum->Next(1, &pMoniker, NULL)) == S_OK) {
+		CComPtr<IBindCtx> ctx;
+		HRESULT_CHECK(CreateBindCtx(0, &ctx));
+		LPOLESTR str;
+		HRESULT_CHECK(pMoniker->GetDisplayName(ctx, NULL, &str));
+		DWORD mksys;
+		HRESULT hr = HRESULT_CHECK(pMoniker->IsSystemMoniker(&mksys));
+		logger->InfoFormat("  '{0}': {1}SystemMoniker, {2}",
+							gcnew String(str), (hr == S_OK) ? "" : "Not ", mksys);
+		CoTaskMemFree(str);
+		pMoniker.Release();
 	}
 }

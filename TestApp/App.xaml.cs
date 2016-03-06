@@ -19,6 +19,9 @@ namespace TestApp
 
             TestApp.Properties.Settings settings = TestApp.Properties.Settings.Default;
             Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = settings.CultureInfo;
+
+            DirectX.CRunningObjectHandler roh = new DirectX.CRunningObjectHandler();
+            roh.PrintROT("TestApp.OnStartup");
         }
     }
 }

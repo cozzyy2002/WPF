@@ -7,3 +7,6 @@
 #include <Windows.h>
 #include <atlbase.h>
 #include <dshow.h>
+#include <initguid.h>
+#include <qnetwork.h>
+

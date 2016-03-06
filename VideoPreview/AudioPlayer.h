@@ -4,7 +4,28 @@
 
 namespace DirectX {
 
-	public ref class CAudioPlayer : public System::ComponentModel::INotifyPropertyChanged {
+	public ref class CRunningObjectHandler {
+	public:
+		static CRunningObjectHandler();
+		CRunningObjectHandler();
+		~CRunningObjectHandler();
+		!CRunningObjectHandler();
+		void PrintROT(String^ title);
+
+	internal:
+		void AddToROT(IUnknown* pUnkGraph);
+		void RemoveFromROT();
+
+	protected:
+		static log4net::ILog^ logger;
+		IRunningObjectTable* pROT;
+		DWORD dwRegister;
+	};
+
+	public ref class CAudioPlayer
+		: public System::ComponentModel::INotifyPropertyChanged
+		, CRunningObjectHandler
+	{
 	public:
 		static CAudioPlayer();
 		CAudioPlayer(System::String^ mediaFile);
