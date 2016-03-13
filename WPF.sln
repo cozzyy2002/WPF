@@ -7,12 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoPreview", "VideoPreview\VideoPreview.vcxproj", "{EA941EEE-C971-4583-BE71-BA94D2818F5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{EB18AA5E-1BD0-4998-81F8-B8C551C8EF8B}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTestCpp", "UnitTestCpp\UnitTestCpp.vcxproj", "{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,16 @@ Global
 		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Debug|Win32.Build.0 = Debug|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Any CPU.ActiveCfg = Release|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Win32.ActiveCfg = Release|Win32
+		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
