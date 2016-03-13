@@ -5,8 +5,20 @@
 
 using namespace System;
 
-HRESULT Win32::hResultCheck(HRESULT hr, String^ method)
+HRESULT Win32::hResultCheck(HRESULT hr, String^ method, HRESULT hrExcept)
 {
+	HRESULT hrExcepts[] = {hrExcept, S_OK};
+	return hResultCheck(hr, method, hrExcepts);
+}
+
+HRESULT Win32::hResultCheck(HRESULT hr, String^ method, const HRESULT* hrExcepts)
+{
+	if(hrExcepts) {
+		while(FAILED(*hrExcepts)) {
+			if(hr == *(hrExcepts++)) return hr;
+		}
+	}
+
 	if(FAILED(hr)) {
 		String^ hrMsg = nullptr;
 		TCHAR buffer[MAX_ERROR_TEXT_LEN];
