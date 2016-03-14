@@ -24,7 +24,8 @@ namespace UnitTestCpp {
 	public:
 		[Test]
 		void noError() {
-			Assert::That(HRESULT_CHECK(S_OK), Is::EqualTo(S_OK));
+			HRESULT hr = S_OK;
+			Assert::That(HRESULT_CHECK(hr), Is::EqualTo(hr));
 		}
 		[Test]
 		void noError_Except() {
