@@ -59,6 +59,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies />
     </Link>
+    <PreBuildEvent>
+      <Command>taskkill /F /IM vstest.discoveryengine.x86.exe /FI "MEMUSAGE gt 1"</Command>
+      <Message>Killing vstest.discoveryengine.x86.exe</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -71,6 +75,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies />
     </Link>
+    <PreBuildEvent>
+      <Command>taskkill /F /IM vstest.discoveryengine.x86.exe /FI "MEMUSAGE gt 1"</Command>
+      <Message>Killing vstest.discoveryengine.x86.exe</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">

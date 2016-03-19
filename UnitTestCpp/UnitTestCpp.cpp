@@ -14,10 +14,18 @@ namespace UnitTestCpp {
 
 	ref class Result {
 	public:
-		Result(HRESULT hr) : hr(hr) {}
-		void result() { HRESULT_CHECK(hr); }
+		Result(HRESULT hr) : hr(hr), hrExcept(S_OK), hrExcepts(NULL) {}
+		Result(HRESULT hr, HRESULT hrExcept) : hr(hr), hrExcept(hrExcept), hrExcepts(NULL) {}
+		Result(HRESULT hr, HRESULT* hrExcepts) : hr(hr), hrExcept(S_OK), hrExcepts(hrExcepts) {}
+		void result() {
+			if(FAILED(hrExcept)) HRESULT_CHECK_EX(hr, hrExcept);
+			else if(hrExcepts) HRESULT_CHECK_EX(hr, hrExcepts);
+			else HRESULT_CHECK(hr);
+		}
 
 		HRESULT hr;
+		HRESULT hrExcept;
+		HRESULT* hrExcepts;
 	};
 
 	[TestFixture]
@@ -36,17 +44,43 @@ namespace UnitTestCpp {
 		}
 		[Test]
 		void noError_ExceptAny() {
-			HRESULT hrs[] = {E_ABORT, E_ACCESSDENIED, S_OK};
-			Assert::That(HRESULT_CHECK_EX(E_ACCESSDENIED, hrs), Is::EqualTo(E_ACCESSDENIED));
+			HRESULT hr = E_ACCESSDENIED;
+			HRESULT hrs[] = {E_ABORT, E_FAIL, hr, S_OK};
+			Assert::That(HRESULT_CHECK_EX(hr, hrs), Is::EqualTo(hr));
 		}
-		[Test]
-		void error()
+
+		ref struct ErrorData {
+			ErrorData(HRESULT hr, Type^ type) : hr(hr), type(type) {}
+			HRESULT hr;
+			Type^ type;
+		};
+
+		static array<ErrorData^>^ errorDatas = {
+			gcnew ErrorData(E_FAIL, System::Runtime::InteropServices::COMException::typeid),
+			gcnew ErrorData(E_ACCESSDENIED, UnauthorizedAccessException::typeid),
+			gcnew ErrorData(E_NOTIMPL, NotImplementedException::typeid),
+		};
+
+		[Test, TestCaseSource("errorDatas")]
+		void error(ErrorData^ errorData)
 		{
-			Result^ result = gcnew Result(E_ABORT);
+			Result^ result = gcnew Result(errorData->hr);
 
 			ComOperationFailedException^ ex =
 			Assert::Throws<ComOperationFailedException^>(gcnew TestDelegate(result, &Result::result));
 			Assert::That(ex->HResult, Is::EqualTo(result->hr));
+			Assert::That(ex->InnerException->GetType(), Is::EqualTo(errorData->type));
+			Assert::That(ex->InnerException->HResult, Is::EqualTo(result->hr));
+		}
+
+		[Test, TestCaseSource("errorDatas")]
+		void error_Except(ErrorData^ errorData)
+		{
+			Result^ result = gcnew Result(errorData->hr, E_NOT_SET);
+			ComOperationFailedException^ ex =
+			Assert::Throws<ComOperationFailedException^>(gcnew TestDelegate(result, &Result::result));
+			Assert::That(ex->HResult, Is::EqualTo(result->hr));
+			Assert::That(ex->InnerException->GetType(), Is::EqualTo(errorData->type));
 			Assert::That(ex->InnerException->HResult, Is::EqualTo(result->hr));
 		}
 	};
