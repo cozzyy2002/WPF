@@ -12,12 +12,12 @@ using namespace Win32;
 
 namespace UnitTestCpp {
 
-	ref class Result {
+	public ref class Checker {
 	public:
-		Result(HRESULT hr) : hr(hr), hrExcept(S_OK), hrExcepts(NULL) {}
-		Result(HRESULT hr, HRESULT hrExcept) : hr(hr), hrExcept(hrExcept), hrExcepts(NULL) {}
-		Result(HRESULT hr, HRESULT* hrExcepts) : hr(hr), hrExcept(S_OK), hrExcepts(hrExcepts) {}
-		void result() {
+		Checker(HRESULT hrExcept) : hrExcept(hrExcept), hrExcepts(NULL) {}
+		Checker(const HRESULT* hrExcepts) : hrExcept(S_OK), hrExcepts(hrExcepts) {}
+		Checker() : hrExcept(S_OK), hrExcepts(NULL) {}
+		void check() {
 			if(FAILED(hrExcept)) HRESULT_CHECK_EX(hr, hrExcept);
 			else if(hrExcepts) HRESULT_CHECK_EX(hr, hrExcepts);
 			else HRESULT_CHECK(hr);
@@ -25,7 +25,7 @@ namespace UnitTestCpp {
 
 		HRESULT hr;
 		HRESULT hrExcept;
-		HRESULT* hrExcepts;
+		const HRESULT* hrExcepts;
 	};
 
 	[TestFixture]
@@ -55,33 +55,28 @@ namespace UnitTestCpp {
 			Type^ type;
 		};
 
-		static array<ErrorData^>^ errorDatas = {
-			gcnew ErrorData(E_FAIL, System::Runtime::InteropServices::COMException::typeid),
-			gcnew ErrorData(E_ACCESSDENIED, UnauthorizedAccessException::typeid),
-			gcnew ErrorData(E_NOTIMPL, NotImplementedException::typeid),
-		};
+		static array<Checker^>^ checkers;
 
-		[Test, TestCaseSource("errorDatas")]
-		void error(ErrorData^ errorData)
-		{
-			Result^ result = gcnew Result(errorData->hr);
-
-			ComOperationFailedException^ ex =
-			Assert::Throws<ComOperationFailedException^>(gcnew TestDelegate(result, &Result::result));
-			Assert::That(ex->HResult, Is::EqualTo(result->hr));
-			Assert::That(ex->InnerException->GetType(), Is::EqualTo(errorData->type));
-			Assert::That(ex->InnerException->HResult, Is::EqualTo(result->hr));
+		static Win32Test() {
+			static const HRESULT hrExcepts[] = {E_INVALIDARG, E_FAIL, S_OK};
+			checkers = gcnew array<Checker^> {
+				gcnew Checker(),
+				gcnew Checker(E_INVALIDARG),
+				gcnew Checker(hrExcepts),
+			};
 		}
 
-		[Test, TestCaseSource("errorDatas")]
-		void error_Except(ErrorData^ errorData)
+		[Test, TestCaseSource("checkers")]
+		void error(Checker^ checker)
 		{
-			Result^ result = gcnew Result(errorData->hr, E_NOT_SET);
+			checker->hr = E_NOTIMPL;
+			Type^ exceptionType = NotImplementedException::typeid;
+
 			ComOperationFailedException^ ex =
-			Assert::Throws<ComOperationFailedException^>(gcnew TestDelegate(result, &Result::result));
-			Assert::That(ex->HResult, Is::EqualTo(result->hr));
-			Assert::That(ex->InnerException->GetType(), Is::EqualTo(errorData->type));
-			Assert::That(ex->InnerException->HResult, Is::EqualTo(result->hr));
+			Assert::Throws<ComOperationFailedException^>(gcnew TestDelegate(checker, &Checker::check));
+			Assert::That(ex->HResult, Is::EqualTo(checker->hr));
+			Assert::That(ex->InnerException->GetType(), Is::EqualTo(exceptionType));
+			Assert::That(ex->InnerException->HResult, Is::EqualTo(checker->hr));
 		}
 	};
 }
