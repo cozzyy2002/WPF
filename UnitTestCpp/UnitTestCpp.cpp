@@ -13,14 +13,25 @@ using namespace Win32;
 namespace UnitTestCpp {
 
 	public ref class Checker {
+		enum class _Type { CHECK, CHECK_EX, CHECK_EX_ANY };
+		_Type type;
+
 	public:
-		Checker(HRESULT hrExcept) : hrExcept(hrExcept), hrExcepts(NULL) {}
-		Checker(const HRESULT* hrExcepts) : hrExcept(S_OK), hrExcepts(hrExcepts) {}
-		Checker() : hrExcept(S_OK), hrExcepts(NULL) {}
+		Checker() : type(_Type::CHECK) {}
+		Checker(HRESULT hrExcept) : type(_Type::CHECK_EX), hrExcept(hrExcept) {}
+		Checker(const HRESULT* hrExcepts) : type(_Type::CHECK_EX_ANY), hrExcepts(hrExcepts) {}
 		void check() {
-			if(FAILED(hrExcept)) HRESULT_CHECK_EX(hr, hrExcept);
-			else if(hrExcepts) HRESULT_CHECK_EX(hr, hrExcepts);
-			else HRESULT_CHECK(hr);
+			switch(type) {
+			case _Type::CHECK:
+				HRESULT_CHECK(hr);
+				break;
+			case _Type::CHECK_EX:
+				HRESULT_CHECK_EX(hr, hrExcept);
+				break;
+			case _Type::CHECK_EX_ANY:
+				HRESULT_CHECK_EX(hr, hrExcepts);
+				break;
+			}
 		}
 
 		HRESULT hr;
@@ -48,12 +59,6 @@ namespace UnitTestCpp {
 			HRESULT hrs[] = {E_ABORT, E_FAIL, hr, S_OK};
 			Assert::That(HRESULT_CHECK_EX(hr, hrs), Is::EqualTo(hr));
 		}
-
-		ref struct ErrorData {
-			ErrorData(HRESULT hr, Type^ type) : hr(hr), type(type) {}
-			HRESULT hr;
-			Type^ type;
-		};
 
 		static array<Checker^>^ checkers;
 
