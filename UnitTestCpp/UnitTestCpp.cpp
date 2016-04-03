@@ -40,7 +40,7 @@ namespace UnitTestCpp {
 	};
 
 	[TestFixture]
-	public ref class Win32Test
+	public ref class Win32Test : AssertionHelper
 	{
 	public:
 		[TestCase(S_OK)]
@@ -79,9 +79,10 @@ namespace UnitTestCpp {
 
 			ComOperationFailedException^ ex =
 			Assert::Throws<ComOperationFailedException^>(gcnew TestDelegate(checker, &Checker::check));
-			Assert::That(ex->HResult, Is::EqualTo(checker->hr));
-			Assert::That(ex->InnerException->GetType(), Is::EqualTo(exceptionType));
-			Assert::That(ex->InnerException->HResult, Is::EqualTo(checker->hr));
+			Expect(ex->HResult, Is::EqualTo(checker->hr));
+			Assert::That(ex->InnerException, Is::Not->Null);
+			Expect(ex->InnerException->GetType(), Is::EqualTo(exceptionType));
+			Expect(ex->InnerException->HResult, Is::EqualTo(checker->hr));
 		}
 	};
 }
