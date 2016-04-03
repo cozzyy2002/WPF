@@ -40,25 +40,4 @@ namespace UnitTest
             Assert.That(testee.count, Is.EqualTo(i));
         }
     }
-
-    [TestFixture]
-    public class Class1
-    {
-        [TestCase(0x80070005), Description("E_ACCESSDENIED")]
-        [TestCase(0x80004002)/*, Description("E_NOINTERFACE")*/]
-        public void ExceptionTest(uint code)
-        {
-            try { throw new Win32.ComOperationFailedException("test", (int)code); }
-            catch (Exception ex)
-            {
-                Assert.That(ex.Message, Is.EqualTo("test"));
-
-                Exception inner = ex.InnerException;
-                Assert.That(inner, Is.Not.Null);
-                Debug.WriteLine("{0}: {1}", inner.GetType(), inner.Message);
-                Assert.That(inner.HResult, Is.EqualTo((int)code));
-                Assert.That(inner.Message, Is.Not.EqualTo(""), inner.Message);
-            }
-        }
-    }
 }

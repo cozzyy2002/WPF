@@ -84,5 +84,22 @@ namespace UnitTestCpp {
 			Expect(ex->InnerException->GetType(), Is::EqualTo(exceptionType));
 			Expect(ex->InnerException->HResult, Is::EqualTo(checker->hr));
 		}
+
+        [TestCase(E_ACCESSDENIED)]
+        [TestCase(E_NOINTERFACE)]
+        void ExceptionTest(HRESULT hr)
+        {
+            try {
+				throw gcnew Win32::ComOperationFailedException("test", hr);
+			} catch (Exception^ ex) {
+                Assert::That(ex->Message, Is::EqualTo("test"));
+
+                Exception^ inner = ex->InnerException;
+                Assert::That(inner, Is::Not->Null);
+                Expect(inner->HResult, Is::EqualTo(hr));
+                Expect(inner->Message, Is::Not->EqualTo(""), inner->Message);
+				Console::WriteLine("InnerException({0}) = {1}:{2}", hr, inner->GetType(), inner->Message);
+            }
+        }
 	};
 }
