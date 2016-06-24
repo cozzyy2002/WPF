@@ -50,7 +50,7 @@ namespace TestApp
             this.selectedCategory = DirectX.CDevice.VideoInputDeviceCategory;
             this.Devices = new ObservableCollection<DirectX.CDevice>();
 
-            this.AudioFileName = @"C:\Windows\Media\ringout.wav";
+            this.AudioFileName = @"C:\Windows\Media\flourish.mid";
         }
 
         public List<DirectX.CDevice.CCategory> DeviceCategories { get; protected set; }

@@ -90,7 +90,8 @@ CAudioPlayer::CAudioPlayer(System::String^ mediaFile, CDevice^ speaker)
 		// Connect output pin of pSource to input pin of pSpeaker
 		CComPtr<IPin> pSourcePin(CDevice::getPin(pSource, PINDIR_OUTPUT));
 		CComPtr<IPin> pOutPin(speaker->getPin());
-		HRESULT_CHECK(pGraph->Connect(pSourcePin, pOutPin));
+		//HRESULT_CHECK(pGraph->Connect(pSourcePin, pOutPin));
+		HRESULT_CHECK(pGraph->Render(pSourcePin));
 	} catch(Exception^ ex) {
 		if(logger->IsErrorEnabled) logger->ErrorFormat("CAudioPlayer() Exception: {0}", ex->Message);
 	}

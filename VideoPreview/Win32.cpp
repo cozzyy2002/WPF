@@ -28,7 +28,7 @@ HRESULT Win32::hResultCheck(HRESULT hr, String^ method, const HRESULT* hrExcepts
 		}
 
 		String^ msg = String::Format("'{0}' failed. {1}(0x{2:x})", method, (hrMsg != nullptr) ? hrMsg : "<unknown HRESULT>", hr);
-			throw gcnew Win32::ComOperationFailedException(msg, hr);
+		throw gcnew Win32::ComOperationFailedException(msg, hr);
 	}
 	return hr;
 }
