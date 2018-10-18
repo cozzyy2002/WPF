@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{4460A06D-6B4A-485D-8DA3-375966D30702}"
 EndProject
@@ -15,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{3D7E8CD3-F710-4DDC-AB5F-E220BA87555C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTestCpp", "UnitTestCpp\UnitTestCpp.vcxproj", "{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ie.WPF", "ie.WPF\ie.WPF.csproj", "{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,18 @@ Global
 		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Win32.ActiveCfg = Release|Win32
 		{22C332C8-DBDE-4DE5-8275-87C13DD5ADA4}.Release|Win32.Build.0 = Release|Win32
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Debug|Win32.Build.0 = Debug|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Release|Win32.ActiveCfg = Release|Any CPU
+		{5FCDC101-99A1-4D25-8BE0-BC214D9A5105}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
