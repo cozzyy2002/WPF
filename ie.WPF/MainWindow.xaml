@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ie.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
+        Title="MainWindow" Height="765" Width="749">
+    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid>
@@ -19,12 +20,11 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="URL:" Grid.Column="0" />
-                <TextBox x:Name="UrlText" Grid.Column="1"/>
+                <TextBox Text="{Binding Path=TargetUrl, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Grid.Column="1"/>
                 <Button Content="Open" Click="GoButton_Click" Grid.Column="2"/>
             </Grid>
         </Grid>
-        <Grid Grid.Row="1">
-            <WebBrowser x:Name="webBrowser" />
-        </Grid>
+        <WebBrowser x:Name="webBrowser" Grid.Row="1" />
+        <Label Content="{Binding Path=CurrentUrl, Mode=OneWay}" Grid.Row="2" />
     </Grid>
 </Window>
